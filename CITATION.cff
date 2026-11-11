@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "Please cite the associated research article when using this solver."
+title: "Conservative Finite Difference Method for the GPE of a 1D Bose Polaron"
+type: software
+authors:
+  - family-names: Majumdar
+    given-names: Saptarshi
+repository-code: "https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Relaxation dynamics of a mobile impurity injected into a one-dimensional Bose gas"
+  authors:
+    - family-names: Majumdar
+      given-names: Saptarshi
+    - family-names: Petković
+      given-names: Aleksandra
+  year: 2025
+  journal: Physical Review A
+  volume: 112
+  start: '053326'
+  doi: 10.1103/tgl5-rdn5
