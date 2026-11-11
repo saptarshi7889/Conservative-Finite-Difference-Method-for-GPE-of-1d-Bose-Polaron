@@ -138,10 +138,10 @@ i\partial_t\phi = \left[-\frac{1+m/M}{2}\partial_x^2
 V(t)=V_0+\frac{i(m/M)}{\sqrt\gamma}\int\phi^*\partial_x\phi\,dx.
 $$
 
-Here x is measured in healing lengths, time in inverse chemical-potential units,
-phi in square roots of the background density, and V in sound-speed units.
+Here $x$ is measured in healing lengths, $t$ in inverse chemical-potential units,
+$\phi$ in square roots of the background density, and $V$ in sound-speed units.
 These conventions correspond to the coefficients of the supplied code.
-The kinetic factor `1+m/M` selects Eq. (5), rather than the alternative Eq. (7)
+The kinetic factor $1+m/M$ selects Eq. (5), rather than the alternative Eq. (7)
 discussed in the paper. The discrete velocity routine uses its original
 symmetrization over both adjacent time slices. The inherited source comments
 refer to separate numerical notes (Eqs. 4.6/4.7); those notes were not supplied.
