@@ -131,12 +131,11 @@ one-cell offset is retained for regression compatibility.
 
 The coefficient structure implements the dimensionless equations
 
-$$
-i\partial_t\phi = \left[-\frac{1+m/M}{2}\partial_x^2
+$i\partial_t\phi = \left[-\frac{1+m/M}{2}\partial_x^2
  + |\phi|^2 + \widetilde G\delta(x) + i V(t)\partial_x\right]\phi,
 \qquad
 V(t)=V_0+\frac{i(m/M)}{\sqrt\gamma}\int\phi^*\partial_x\phi\,dx.
-$$
+$
 
 Here $x$ is measured in healing lengths, $t$ in inverse chemical-potential units,
 $\phi$ in square roots of the background density, and $V$ in sound-speed units.
