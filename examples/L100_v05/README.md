@@ -1,5 +1,7 @@
 # L=100 run, review at t=10
 
+The generated L=100 data and plots were deleted at the user’s request.
+
 Run locally with `python3 examples/L100_v05/run.py` from the repository root.
 The runner refuses existing output and takes an exclusive lock to prevent
 simultaneous launches. Data are saved under `results_L100_v05/` (excluded from Git).

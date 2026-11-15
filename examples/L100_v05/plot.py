@@ -47,6 +47,13 @@ ax.set(xlabel="Position in impurity frame", ylabel=r"$|\psi(x)|^2$",
 fig.tight_layout()
 fig.savefig(OUTPUT / "density_t10.png", dpi=FIGURE_DPI)
 plt.close(fig)
+fig, ax = plt.subplots(figsize=FIGURE_SIZE)
+ax.plot(field[:, 0], field[:, 1]**2 + field[:, 2]**2)
+ax.set(xlabel="Position in impurity frame", ylabel=r"$|\psi(x)|^2$",
+       title="L=100: full-system boson density at t=10", xlim=(-LENGTH/2, LENGTH/2))
+fig.tight_layout()
+fig.savefig(OUTPUT / "density_t10_full_system.png", dpi=FIGURE_DPI)
+plt.close(fig)
 convergence = np.loadtxt(RESULTS / "convergence.dat", ndmin=2)
 norm = np.loadtxt(RESULTS / "norm.dat", ndmin=2)
 assert convergence[-1, 0] == REVIEW_TIME
