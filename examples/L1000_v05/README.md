@@ -1,6 +1,6 @@
 # L=1000 Bose-polaron test run
 
-Status: simulation running.
+Status: stopped at the user’s request. All generated simulation data and previews were deleted.
 
 The simulation runs locally on the laptop. Data are written under
 `results_L1000_v05/` in this local repository, excluded from Git. Nothing is

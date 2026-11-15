@@ -91,17 +91,25 @@ int main(int argc, char** argv) {
               <<"\nstart "<<t_init<<"\nend "<<t_fin<<"\ntolerance "<<err_iter<<"\niterations "<<K_fin
               <<"\nsave_every "<<save_every<<"\nrestart_velocity "<<real(V)<<"\n";
     if (args.count("--restart")) parameters<<"restart "<<args.at("--restart")<<"\n";
+    parameters.flush();
     velocity<<"# time real_velocity imaginary_velocity\n";
     norm<<"# time euclidean_norm dx_sum_abs_phi_squared\n";
     convergence<<"# time iterations iterate_difference_norm\n";
     auto record = [&](double time, int step) {
         velocity<<time<<" "<<real(V)<<" "<<imag(V)<<"\n";
         norm<<time<<" "<<Phi_n.norm()<<" "<<delta_x*Phi_n.squaredNorm()<<"\n";
-        ofstream phi(output/("phi_"+to_string(step)+".dat"));
+        const auto snapshot = output/("phi_"+to_string(step)+".dat");
+        const auto temporary = filesystem::path(snapshot.string()+".tmp");
+        ofstream phi(temporary);
         phi.exceptions(ios::badbit|ios::failbit);
         phi<<setprecision(OUTPUT_PRECISION);
         for (int i=0;i<space_points;++i)
             phi<<i*delta_x-Length/2.0<<" "<<real(Phi_n(i))<<" "<<imag(Phi_n(i))<<"\n";
+        phi.close();
+        velocity.flush();
+        norm.flush();
+        convergence.flush();
+        filesystem::rename(temporary, snapshot);
     };
     Delta_Function(Delta_matrix,space_points);
     Delta_matrix *= G_tilde/delta_x;
