@@ -1,0 +1,4 @@
+Completed t=20. Final velocity: 0.2817480339881665
+Original 0<=t<=16.5 velocity history preserved byte-for-byte.
+201 velocity rows; 41 compressed configurations; no raw configurations remain.
+Plots at t=15: velocity_t15.png, density_t15.png, density_t15_full_system.png

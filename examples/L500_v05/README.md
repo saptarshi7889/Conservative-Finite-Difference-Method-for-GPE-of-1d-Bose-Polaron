@@ -53,3 +53,45 @@ for -20<x<20, and density_t15_full_system.png, while evolution continues to t=20
 Monitor results_L500_v05/velocity.dat and continuation.log. Completion checks
 verify the original velocity bytes are intact, 201 velocity records, and 41
 compressed configurations. No continuation beyond t=20 is launched.
+
+## Restart from the saved t=16.5 checkpoint
+
+The paused solver was retired so the next evolution starts exactly from
+phi_1650.dat.xz with checkpoint velocity 0.2815169869407339. V0 remains 0.5.
+All physical and numerical parameters, save intervals, append behavior,
+and the continuation-source executable remain unchanged. Existing t=15 plots
+are preserved. New configurations use absolute steps 1700 through 2000 in the
+same results folder. The new solver log is continuation_1650.log.
+The endpoint is t=20; no evolution beyond t=20 is launched.
+
+## Continuation from t=20 to t=25
+
+Restart: phi_2000.dat.xz with logged velocity 0.2817480339881665.
+All physical/numerical parameters and the continuation-source executable remain
+unchanged. The runner appends velocity/norm/convergence records to the same
+files and saves steps 2050 through 2500 in the same results directory.
+Configurations are compressed and verified, then raw files are removed.
+No duplicate t=20 velocity row is written. Existing history is checked for
+byte-for-byte preservation at completion. Expected totals: 251 velocity rows
+and 51 compressed configurations. The endpoint is t=25, with no later evolution.
+
+At t=25, plot_t25.py generates velocity_t25.png, density_t25.png (-15<x<15),
+and density_t25_full_system.png. Log: continuation_2000.log; completion report:
+continuation_2000_summary.txt. Earlier plots and reports are preserved.
+
+## Synchronized velocity and density animation
+
+`animate.py` reads all 51 compressed configurations (t=0,0.5,...,25) and
+velocity.dat. The velocity history is the main plot; a synchronized density
+inset shows -15<x<15 in the impurity frame. Both axes remain fixed.
+No saved time slices are skipped; original data stay compressed and unchanged.
+
+Outputs: velocity_density_animation.mp4 (H.264, 1440x840),
+velocity_density_animation.gif, and velocity_density_animation_preview.png.
+Playback: 5 frames/s, duration 10.2 s. Each frame advances 0.5 simulation time
+units, corresponding to 2.5 simulation time units per playback second.
+animation_manifest.json records all source configurations and frame times.
+Existing GStreamer, NumPy, Matplotlib, and Pillow installations were reused.
+The MP4 stream was inspected and decoded successfully; the GIF has 51 frames.
+
+Regenerate: `MPLCONFIGDIR=/tmp/gpe-L500-mpl python3 examples/L500_v05/animate.py`.
