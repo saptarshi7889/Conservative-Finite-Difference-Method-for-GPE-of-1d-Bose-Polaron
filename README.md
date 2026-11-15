@@ -70,7 +70,8 @@ vectors, requiring several GB of memory; they are deliberately not the CLI defau
 | `--velocity` | 2 | Original injection velocity V0; retain this for restarts |
 | `--tolerance` | 1e-8 | Absolute Euclidean norm tolerance between Picard iterates |
 | `--iterations` | 12 | Maximum Picard iterations per time step |
-| `--save-every` | 10 | Steps between diagnostics and field snapshots |
+| `--save-every` | 10 | Steps between norm diagnostics and field snapshots |
+| `--velocity-every` | save-every | Steps between velocity records (flushed immediately) |
 | `--output` | results | New output directory; must not already exist |
 
 Options use `--name value`. Length/dx and (end-start)/dt must be integers within
@@ -120,7 +121,8 @@ at zero in each output directory.
 | `parameters.txt` | Physical and numerical parameters and restart provenance |
 
 Diagnostics have comment headers starting with `#`. Initial and final states
-are always saved. The original norm output is `sqrt(sum(abs(phi)^2))`; the third
+are always saved. Configurations are published by atomic rename only after the
+complete file is closed; diagnostics are flushed at each configuration save. The original norm output is `sqrt(sum(abs(phi)^2))`; the third
 column of the new norm file gives the dimensionless particle-number integral.
 
 The grid is `x_i = i*dx - length/2`. The supplied delta-potential routine places

@@ -18,7 +18,7 @@ constexpr double GRID_TOLERANCE = 1e-9;
 void usage() {
     cout << "Usage: gpe [--length L] [--dx DX] [--dt DT] [--end T]\n"
          << "  [--mass-ratio m/M] [--coupling G] [--gamma GAMMA] [--velocity V0]\n"
-         << "  [--tolerance E] [--iterations K] [--save-every N] [--output DIR]\n"
+         << "  [--tolerance E] [--iterations K] [--save-every N] [--velocity-every N] [--output DIR]\n"
          << "  [--restart PHI_FILE --start T --restart-velocity V]\n"
          << "Restart requires the same physical and grid parameters, original V0,\n"
          << "and the velocity recorded at the checkpoint time. Output DIR must not exist.\n";
@@ -28,7 +28,7 @@ void usage() {
 int main(int argc, char** argv) {
  try {
     map<string,string> args;
-    const string allowed = " length dx dt end mass-ratio coupling gamma velocity tolerance iterations save-every output restart start restart-velocity ";
+    const string allowed = " length dx dt end mass-ratio coupling gamma velocity tolerance iterations save-every velocity-every output restart start restart-velocity ";
     for (int j=1; j<argc; ++j) {
         string key=argv[j];
         if (key=="--help") { usage(); return 0; }
@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
     const double m_tilde=number("--mass-ratio",DEFAULT_MASS_RATIO), G_tilde=number("--coupling",DEFAULT_COUPLING);
     const double gamma=number("--gamma",DEFAULT_GAMMA), err_iter=number("--tolerance",DEFAULT_TOLERANCE);
     const double iterations=number("--iterations",DEFAULT_ITERATIONS), saving=number("--save-every",DEFAULT_SAVE_EVERY);
+    const double velocity_saving=number("--velocity-every",saving);
     const double points=Length/delta_x, steps=(t_fin-t_init)/delta_t;
     if (!(Length>0 && delta_x>0 && delta_t>0 && t_init>=0 && t_fin>t_init && gamma>0 && m_tilde>=0 && err_iter>0)
         || !isfinite(points) || points<3 || points>numeric_limits<int>::max()
@@ -56,10 +57,12 @@ int main(int argc, char** argv) {
         || !isfinite(steps) || steps<1 || steps>numeric_limits<int>::max()
         || abs(steps-round(steps))>GRID_TOLERANCE
         || iterations<1 || iterations>numeric_limits<int>::max() || iterations!=floor(iterations)
-        || saving<1 || saving>numeric_limits<int>::max() || saving!=floor(saving))
+        || saving<1 || saving>numeric_limits<int>::max() || saving!=floor(saving)
+        || velocity_saving<1 || velocity_saving>numeric_limits<int>::max() || velocity_saving!=floor(velocity_saving))
         throw runtime_error("Invalid grid, time range, or iteration settings; length/dx and (end-start)/dt must be integers.");
     const int space_points=static_cast<int>(round(points)), total_steps=static_cast<int>(round(steps));
     const int K_fin=static_cast<int>(iterations), save_every=static_cast<int>(saving);
+    const int velocity_every=static_cast<int>(velocity_saving);
     Complex V_0(number("--velocity",DEFAULT_VELOCITY),0), V=V_0;
     VectorXcd Phi_n=VectorXcd::Ones(space_points), Delta_matrix(space_points);
     if (args.count("--restart")) {
@@ -89,14 +92,17 @@ int main(int argc, char** argv) {
     parameters<<"length "<<Length<<"\ndx "<<delta_x<<"\ndt "<<delta_t<<"\nmass_ratio "<<m_tilde
               <<"\ncoupling "<<G_tilde<<"\ngamma "<<gamma<<"\nvelocity_0 "<<real(V_0)
               <<"\nstart "<<t_init<<"\nend "<<t_fin<<"\ntolerance "<<err_iter<<"\niterations "<<K_fin
-              <<"\nsave_every "<<save_every<<"\nrestart_velocity "<<real(V)<<"\n";
+              <<"\nsave_every "<<save_every<<"\nvelocity_every "<<velocity_every<<"\nrestart_velocity "<<real(V)<<"\n";
     if (args.count("--restart")) parameters<<"restart "<<args.at("--restart")<<"\n";
     parameters.flush();
     velocity<<"# time real_velocity imaginary_velocity\n";
     norm<<"# time euclidean_norm dx_sum_abs_phi_squared\n";
     convergence<<"# time iterations iterate_difference_norm\n";
-    auto record = [&](double time, int step) {
+    auto record_velocity = [&](double time) {
         velocity<<time<<" "<<real(V)<<" "<<imag(V)<<"\n";
+        velocity.flush();
+    };
+    auto record = [&](double time, int step) {
         norm<<time<<" "<<Phi_n.norm()<<" "<<delta_x*Phi_n.squaredNorm()<<"\n";
         const auto snapshot = output/("phi_"+to_string(step)+".dat");
         const auto temporary = filesystem::path(snapshot.string()+".tmp");
@@ -116,6 +122,7 @@ int main(int argc, char** argv) {
     Complex mult1=(0.25*I*delta_t*(1.0+m_tilde))/(delta_x*delta_x), mult2=0.5*delta_t*I, mult3;
     Complex A1,B1,C1;
     VectorXcd Phi_tilde(space_points),Phi_hat(space_points),Phi_k(space_points),Phi_n1(space_points),Absolute_Phi_tilde_adv(space_points),Absolute_Phi_fixed(space_points),Error_iter(space_points),Error_config(space_points),Temp(space_points);
+    record_velocity(t_init);
     record(t_init,0);
     for (int count=1;count<=total_steps;++count) {
         const double t=t_init+(count-1)*delta_t;
@@ -212,6 +219,7 @@ int main(int argc, char** argv) {
          
         Phi_n=Phi_n1;
         convergence<<t+delta_t<<" "<<k<<" "<<Error_iter.norm()<<"\n";
+        if (count%velocity_every==0 || count==total_steps) record_velocity(t_init+count*delta_t);
         if (count%save_every==0 || count==total_steps) record(t_init+count*delta_t,count);
     }
     cout<<"Results saved in "<<output<<"\n";

@@ -65,3 +65,10 @@ with tempfile.TemporaryDirectory() as directory:
         '--restart-velocity', '2', success=False)
     run(root, 'nonconvergent', '--iterations', '1', success=False)
     print('invalid inputs and nonlinear nonconvergence rejected')
+
+    cadence = run(root, 'cadence', '--save-every', '10', '--velocity-every', '5')
+    assert [row[0] for row in rows(cadence / 'velocity.dat')] == [0, 0.005, 0.01, 0.015, 0.02]
+    assert sorted(path.name for path in cadence.glob('phi_*.dat')) == ['phi_0.dat', 'phi_10.dat', 'phi_20.dat']
+    assert not list(cadence.glob('*.tmp'))
+    run(root, 'bad_velocity_interval', '--velocity-every', '0', success=False)
+    print('independent velocity/configuration save intervals verified')
