@@ -10,3 +10,5 @@ __pycache__/
 /results_L100_v05/
 
 /results_L500_v05/
+
+/dist/

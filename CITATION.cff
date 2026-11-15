@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "Please cite the associated research article when using this solver."
 title: "Conservative Finite Difference Method for the GPE of a 1D Bose Polaron"
 type: software
+version: 0.1.0
 authors:
   - family-names: Majumdar
     given-names: Saptarshi

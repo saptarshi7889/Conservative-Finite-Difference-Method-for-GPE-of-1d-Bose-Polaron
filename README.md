@@ -30,6 +30,12 @@ $10^{-8}$, and at most 10 iterations per step. Playback is accelerated.
 
 [Download the MP4 video](docs/media/velocity_density_animation.mp4).
 
+## Releases
+
+Versioned source downloads are published on the [GitHub Releases page](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases).
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for v0.1.0 requirements and numerical
+limitations. Eigen is an external dependency; precompiled binaries are not included.
+
 ## Build
 
 Requirements: a C++17 compiler, Eigen 3.3 or newer, and either Make or CMake 3.16+.

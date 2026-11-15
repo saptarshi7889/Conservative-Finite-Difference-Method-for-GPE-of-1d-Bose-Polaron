@@ -1,0 +1,61 @@
+name: Source release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [g++, clang++]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Eigen
+        run: sudo apt-get update && sudo apt-get install -y libeigen3-dev
+      - name: Check tag matches package version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re
+          version = re.search(r'project\(bose_polaron_gpe VERSION ([0-9.]+)', pathlib.Path('CMakeLists.txt').read_text()).group(1)
+          assert os.environ['RELEASE_TAG'] == 'v' + version, 'Tag must match CMake project version'
+          PY
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+      - name: Build
+        run: cmake --build build --parallel 2
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+      - name: Package and test extracted source
+        run: |
+          python3 scripts/package_release.py
+          cd dist
+          sha256sum -c SHA256SUMS
+          mkdir extracted
+          tar -xzf bose-polaron-gpe-*.tar.gz -C extracted
+          make -C extracted/bose-polaron-gpe-* test CXX=${{ matrix.compiler }}
+
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package
+        run: python3 scripts/package_release.py
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" dist/*.tar.gz dist/*.zip dist/SHA256SUMS \
+            --verify-tag --title "$RELEASE_TAG — Bose-polaron GPE solver" \
+            --notes-file RELEASE_NOTES.md
