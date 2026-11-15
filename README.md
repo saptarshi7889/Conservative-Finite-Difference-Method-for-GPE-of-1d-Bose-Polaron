@@ -187,6 +187,56 @@ Define the unscaled second difference and the velocity-selected first difference
 \end{cases}
 ```
 
+For the ordered field vector $\Phi=(\Phi_0,\Phi_1,\ldots,\Phi_{N-1})^{\mathsf T}$,
+the corresponding matrices are
+
+```math
+L_1=
+\begin{pmatrix}
+-2 & 1 & 0 & \cdots & 1 \\
+1 & -2 & 1 & \ddots & 0 \\
+0 & 1 & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & -2 & 1 \\
+1 & 0 & \cdots & 1 & -2
+\end{pmatrix}_{N\times N}.
+```
+
+For $\mathrm{Re}(V)\geq0$, the forward-difference matrix is
+
+```math
+L_2^{+}=
+\begin{pmatrix}
+-1 & 1 & 0 & \cdots & 0 \\
+0 & -1 & 1 & \ddots & \vdots \\
+\vdots & \ddots & \ddots & \ddots & 0 \\
+0 & \cdots & 0 & -1 & 1 \\
+1 & 0 & \cdots & 0 & -1
+\end{pmatrix}_{N\times N}.
+```
+
+For $\mathrm{Re}(V)<0$, the backward-difference matrix is
+
+```math
+L_2^{-}=
+\begin{pmatrix}
+1 & 0 & \cdots & 0 & -1 \\
+-1 & 1 & 0 & \ddots & 0 \\
+0 & -1 & \ddots & \ddots & \vdots \\
+\vdots & \ddots & \ddots & 1 & 0 \\
+0 & \cdots & 0 & -1 & 1
+\end{pmatrix}_{N\times N},\qquad
+L_2(V)=
+\begin{cases}
+L_2^{+},&\mathrm{Re}(V)\geq0,\\
+L_2^{-},&\mathrm{Re}(V)<0.
+\end{cases}
+```
+
+The corner entries implement periodic boundaries. These are the unscaled
+matrices shown in the notes: the derivative operators are $L_1/h^2$ and
+$L_2(V)/h$. Their dimension is $N\times N$, where $N=L/h$ is the number of
+grid points, rather than the physical system length $L$.
+
 The forward stencil for positive velocity follows the sign of the drift in
 $\partial_t\phi=V\partial_x\phi+\cdots$, whose transport speed is $-V$.
 The delta potential is represented by $D_j=(\widetilde G/h)\delta_{j,j_*}$,
