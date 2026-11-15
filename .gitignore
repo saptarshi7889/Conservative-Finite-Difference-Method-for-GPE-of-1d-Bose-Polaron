@@ -2,3 +2,7 @@
 /results/
 *.dat
 __pycache__/
+
+/results_L1000_v05/
+/results_L1000_v05_previous_s10/
+/results_L1000_v05_interrupted_s50/
