@@ -167,8 +167,8 @@ Define the unscaled second difference and the velocity-selected first difference
 (L_1\Phi)_j=\Phi_{j+1}-2\Phi_j+\Phi_{j-1},\qquad
 (L_2(V)\Phi)_j=
 \begin{cases}
-\Phi_{j+1}-\Phi_j,&\operatorname{Re}V\geq0,\\
-\Phi_j-\Phi_{j-1},&\operatorname{Re}V<0.
+\Phi_{j+1}-\Phi_j,&\mathrm{Re}(V)\geq0,\\
+\Phi_j-\Phi_{j-1},&\mathrm{Re}(V)<0.
 \end{cases}
 ```
 
