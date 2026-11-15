@@ -27,3 +27,29 @@ not establish elimination of boundary effects or spatial/temporal convergence.
 ![Density, -20<x<20](density_t10.png)
 
 ![Full-system density](density_t10_full_system.png)
+
+## Continuation from t=10 to t=20
+
+`continue_run.py` resumes `results_L500_v05/phi_1000.dat.xz` using its
+logged checkpoint velocity (0.2811383215428751), with V0=0.5 unchanged.
+It appends directly to the existing **velocity.dat**; there is no separate
+vel.dat file. Norm and convergence histories are appended too. The original
+parameters.txt is preserved and continuation metadata is stored separately.
+Configurations phi_1050.dat.xz through phi_2000.dat.xz use absolute step numbers
+and remain in the same results directory. Save intervals and compression are
+unchanged. A temporary decompressed restart file is removed after loading.
+
+The executable is compiled from the numerical routines and time-update block of
+`finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp`,
+using `prepare_continuation.py` to add the validated restart/output driver from
+src/main.cpp. The original research file is unchanged. The generated driver
+checks convergence, stops exactly at t=20, flushes velocities, appends without
+a duplicate t=10 row, and publishes only completed configuration files.
+Small positive/negative-velocity split-run checks agree with continuous evolution
+within 2e-13; existing CLI checks pass with absolute continuation step filenames.
+
+At t=15, plot_t15.py generates velocity_t15.png from velocity.dat, density_t15.png
+for -20<x<20, and density_t15_full_system.png, while evolution continues to t=20.
+Monitor results_L500_v05/velocity.dat and continuation.log. Completion checks
+verify the original velocity bytes are intact, 201 velocity records, and 41
+compressed configurations. No continuation beyond t=20 is launched.
