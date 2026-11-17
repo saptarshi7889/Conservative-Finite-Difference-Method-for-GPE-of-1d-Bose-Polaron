@@ -8,8 +8,9 @@ for the nonlinear update, with a velocity-dependent one-sided spatial stencil.
 The command-line program supports both a uniform initial field, `phi(x)=1`, and
 continuation from a saved field. The two supplied research programs remain
 unchanged in the repository root. `src/numerics.hpp` preserves their shared
-numerical routines (copied from the fresh-run program); `src/main.cpp` retains
-the fresh-run update equations with a new input/output driver.
+numerical routines (copied from the fresh-run program); `src/solver.cpp` retains
+the fresh-run update equations behind a callable C++ library; `src/main.cpp`
+provides its command-line driver.
 
 **Numerical status:** the packaged update matches the supplied fresh-run code
 exactly in a small regression case. This does not establish exact particle-number
@@ -38,13 +39,13 @@ limitations. Eigen is an external dependency; precompiled binaries are not inclu
 
 ## Build
 
-Requirements: a C++17 compiler, Eigen 3.3 or newer, and either Make or CMake 3.16+.
+Requirements: a C++17 compiler, Eigen 3.3 or newer, zlib development headers/library, and either Make or CMake 3.16+.
 Python 3 is needed only for tests. No Python packages are required. Dependencies
 must already be installed; neither local build command downloads anything.
 
 ### Conda setup (Linux and macOS)
 
-The supplied `environment.yml` declares the compiler, Eigen, CMake, Make, and
+The supplied `environment.yml` declares the compiler, Eigen, zlib, CMake, Make, and
 Python needed to build and test the solver in a dedicated environment:
 
 ```sh
@@ -57,8 +58,7 @@ ctest --test-dir build-conda --output-on-failure
 ```
 
 Environment creation downloads dependencies. The manifest specifies compatible
-version ranges, not an exact lockfile. Eigen is the solver's only external C++
-library; Python is used for the test driver. Plotting/animation scripts under
+version ranges, not an exact lockfile. Eigen and zlib are the solver dependencies; Python is used for the test driver. Plotting/animation scripts under
 `examples/` have separate optional dependencies and are not part of this setup.
 
 ### Automatic tests
@@ -69,7 +69,10 @@ Conda environment above. CTest runs direct numerical function checks (the open
 and periodic Thomas solvers against an independent dense solve, density, delta
 placement, and uniform-field velocity) and the simulation integration tests
 (restart consistency, uniform-solution conservation, output cadence, and invalid
-inputs). These tests do not establish conservation for interacting simulations.
+inputs). Library tests additionally verify archive contents, in-memory continuation,
+CLI equivalence, velocity records visible during evolution, and installation
+into a separate consumer project. These tests do not establish conservation for
+interacting simulations.
 
 To prevent merging failed tests, configure a GitHub branch rule for `master`
 requiring these status checks after the workflow has run successfully.
@@ -99,6 +102,97 @@ For a nonstandard Eigen installation, pass `-DEigen3_DIR=/path/to/share/eigen3/c
 Make also supports `make install PREFIX="$HOME/.local"`.
 Do not mix the Make and CMake build directories; remove your generated build
 directory or choose another CMake directory when switching build systems.
+
+## C++ library
+
+Include `<gpe/solver.hpp>` and link to the CMake target `gpe::solver`:
+
+```cpp
+#include <gpe/solver.hpp>
+
+gpe::SimulationParameters parameters;
+parameters.t_final = final_time;
+parameters.length = system_length;
+parameters.V_0 = injection_velocity;
+parameters.mass_ratio = boson_mass / impurity_mass; // m/M, not M/m
+parameters.G = coupling;
+parameters.gamma = gamma;
+parameters.dx = grid_spacing;
+parameters.dt = time_step;
+parameters.picard_tolerance = tolerance;
+parameters.max_picard_iterations = iteration_limit;
+parameters.config_save_every = configuration_interval;
+parameters.velocity_save_every = velocity_interval;
+parameters.output_directory = "my-simulation";
+auto result = gpe::GPE_solver(parameters);
+```
+
+The physical/numerical defaults are the small CLI defaults listed below.
+Saving intervals count **time steps**, not Picard iterations. Both default to
+10 independently. The initial state and final state are always recorded.
+`length/dx` and `(t_final-t_initial)/dt` must be integers, with at least three
+spatial points. The boundary conditions remain periodic.
+
+Velocity rows are appended to a single open `velocity.dat` stream and flushed
+immediately every `velocity_save_every` steps, plus the initial and final times.
+The function retains no velocity history in memory. Each run requires a new
+output directory; it never appends a new run to an existing trajectory file.
+
+`result.configurations_archive` points to `configurations.tar.gz`, a standard
+archive of `phi_STEP.dat` files with columns x, Re(phi), Im(phi). Snapshots are
+compressed incrementally; memory holds only one snapshot's formatted text,
+not the full trajectory. The ustar archive format limits a single snapshot to
+8 GiB minus one byte. Extract with `tar -xzf configurations.tar.gz` before using
+a snapshot with the CLI restart option. The CLI also writes plain snapshots.
+`norm.dat`, `convergence.dat`, and `parameters.txt` accompany the archive.
+`result.velocity_file` is the velocity file path. `result.final_field`,
+`result.final_velocity` (complex), and `result.final_time` allow further evolution
+without rereading files.
+
+Optional initial-condition settings:
+
+| Setting | Default / meaning |
+| --- | --- |
+| `initial_field` | Empty Eigen complex vector means uniform phi=1; otherwise one finite value per grid point |
+| `t_initial` | Zero; starting time for evolution |
+| `initial_velocity` | Unset means V_0; optionally supply a complex checkpoint velocity |
+| `write_plain_snapshots` | False; also write plain checkpoint files when true |
+
+The grid is `x_j = j*dx - length/2`. For continuation at positive `t_initial`,
+provide both `initial_field` and `initial_velocity`, retain the original `V_0`,
+and keep the physical/grid parameters consistent. For example:
+
+```cpp
+parameters.initial_field = result.final_field;
+parameters.initial_velocity = result.final_velocity;
+parameters.t_initial = result.final_time;
+parameters.t_final = next_final_time;
+parameters.output_directory = "continued-simulation";
+auto continued = gpe::GPE_solver(parameters);
+```
+
+Invalid input, nonlinear nonconvergence, and I/O failures throw exceptions;
+callers should catch `const std::exception&`. Partial files remain on failure.
+An interrupted archive may be incomplete and require recovery; successful return
+means it was finalized. Existing numerical limitations still apply.
+
+For use inside another CMake project, `add_subdirectory(path/to/this/repository)`
+and `target_link_libraries(your_target PRIVATE gpe::solver)` suffice. Alternatively,
+install the library and use its exported package:
+
+```sh
+cmake -S . -B build-library -DCMAKE_BUILD_TYPE=Release
+cmake --build build-library --parallel 2
+ctest --test-dir build-library --output-on-failure
+cmake --install build-library --prefix "$HOME/.local"
+cmake -S examples/library -B build-library/example -DCMAKE_PREFIX_PATH="$HOME/.local"
+cmake --build build-library/example --parallel 2
+```
+
+The consumer uses `find_package(gpe CONFIG REQUIRED)` followed by
+`target_link_libraries(your_target PRIVATE gpe::solver)`. See
+[`examples/library`](examples/library) for a complete example. Eigen and zlib
+must also be discoverable when configuring the consumer.
 
 ## Fresh run
 
@@ -167,6 +261,7 @@ at zero in each output directory.
 
 | File | Columns / content |
 | --- | --- |
+| `configurations.tar.gz` | Compressed configuration snapshots |
 | `velocity.dat` | time, Re(V), Im(V) |
 | `norm.dat` | time, Euclidean norm of phi, dx × sum(abs(phi)^2) |
 | `convergence.dat` | time, accepted iteration count, norm of last iterate difference |
@@ -174,7 +269,7 @@ at zero in each output directory.
 | `parameters.txt` | Physical and numerical parameters and restart provenance |
 
 Diagnostics have comment headers starting with `#`. Initial and final states
-are always saved. Configurations are published by atomic rename only after the
+are always saved. Plain CLI configurations are published by atomic rename only after the
 complete file is closed; diagnostics are flushed at each configuration save. The original norm output is `sqrt(sum(abs(phi)^2))`; the third
 column of the new norm file gives the dimensionless particle-number integral.
 
@@ -207,7 +302,7 @@ as detailed below.
 
 This section summarizes *GPE_simulation.pdf*, Chapter 1, printed pages 2–4,
 Eqs. (1.3)–(1.7), before Section 1.1, and compares those notes with
-[`src/main.cpp`](src/main.cpp) and [`src/numerics.hpp`](src/numerics.hpp).
+[`src/solver.cpp`](src/solver.cpp) and [`src/numerics.hpp`](src/numerics.hpp).
 The PDF is not bundled with this repository. Its Eqs. (1.6)/(1.7) describe the
 updates referenced as Eqs. (4.6)/(4.7) in the inherited source comments.
 Tildes on dimensionless quantities are omitted here; write $\mu=m/M$,

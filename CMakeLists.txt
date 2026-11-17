@@ -1,12 +1,33 @@
 cmake_minimum_required(VERSION 3.16)
 project(bose_polaron_gpe VERSION 0.1.0 LANGUAGES CXX)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(ZLIB REQUIRED)
+add_library(gpe_solver src/solver.cpp)
+add_library(gpe::solver ALIAS gpe_solver)
+set_target_properties(gpe_solver PROPERTIES EXPORT_NAME solver CXX_EXTENSIONS OFF)
+target_compile_features(gpe_solver PUBLIC cxx_std_17)
+target_include_directories(gpe_solver PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+target_link_libraries(gpe_solver PUBLIC Eigen3::Eigen PRIVATE ZLIB::ZLIB)
 add_executable(gpe src/main.cpp)
 target_compile_features(gpe PRIVATE cxx_std_17)
-target_link_libraries(gpe PRIVATE Eigen3::Eigen)
+target_link_libraries(gpe PRIVATE gpe::solver)
 set_target_properties(gpe PROPERTIES CXX_EXTENSIONS OFF)
 include(GNUInstallDirs)
-install(TARGETS gpe RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS gpe gpe_solver EXPORT gpeTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT gpeTargets NAMESPACE gpe:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gpe)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(cmake/gpeConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/gpeConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gpe)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/gpeConfigVersion.cmake
+    VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/gpeConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/gpeConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gpe)
 include(CTest)
 if(BUILD_TESTING)
     add_executable(test_numerics tests/numerics.cpp)
@@ -15,6 +36,10 @@ if(BUILD_TESTING)
     set_target_properties(test_numerics PROPERTIES CXX_EXTENSIONS OFF)
     add_test(NAME numerics COMMAND test_numerics)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_executable(test_library tests/library.cpp)
+    target_link_libraries(test_library PRIVATE gpe::solver)
+    add_test(NAME library COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/library.py $<TARGET_FILE:test_library> $<TARGET_FILE:gpe>)
     add_test(NAME integration COMMAND ${Python3_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/integration.py $<TARGET_FILE:gpe>)
 endif()

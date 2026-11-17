@@ -14,9 +14,9 @@ ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 ZIP_COMPRESSION = 9
 FILE_MODE = 0o644
 PACKAGE_PATHS = (
-    'environment.yml',
+    'environment.yml', 'examples/library',
     'CMakeLists.txt', 'Makefile', 'LICENSE', 'CITATION.cff', 'README.md',
-    'VALIDATION.md', 'PUBLISHING.md', 'RELEASE_NOTES.md', 'src', 'tests',
+    'VALIDATION.md', 'PUBLISHING.md', 'RELEASE_NOTES.md', 'src', 'tests', 'include', 'cmake',
     'scripts/package_release.py', '.github/workflows', 'docs/media',
     'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp',
     'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_new_cluster_upwind_scheme_corrected.cpp',
