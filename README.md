@@ -22,7 +22,7 @@ conservation: the short interacting example exhibits relative drift of about
 Impurity velocity with a synchronized boson-density inset over $-15<x<15$
 in the impurity frame. The animation uses all 51 saved configurations from
 $t=0$ to $25$, with periodic system length $L=500$, $V_0=0.5$,
-$m/M=0.333$, $\widetilde{G}=1$, and $\gamma=0.1$.
+$m/M=0.333$, $`\widetilde{G}=1`$, and $\gamma=0.1$.
 The simulation uses $\Delta x=0.001$, $\Delta t=0.01$, Picard tolerance
 $10^{-8}$, and at most 10 iterations per step. Playback is accelerated.
 
