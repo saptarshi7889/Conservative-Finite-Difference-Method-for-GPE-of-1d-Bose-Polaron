@@ -15,7 +15,7 @@ jobs:
       matrix:
         compiler: [g++, clang++]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Eigen and zlib
         run: sudo apt-get update && sudo apt-get install -y libeigen3-dev zlib1g-dev
       - name: Check tag matches package version
@@ -48,7 +48,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Package
         run: python3 scripts/package_release.py
       - name: Publish release
