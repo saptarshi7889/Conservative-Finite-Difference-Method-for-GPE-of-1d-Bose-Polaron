@@ -1,0 +1,10 @@
+name: bose-polaron-gpe
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - cxx-compiler
+  - eigen >=3.3,<4
+  - cmake >=3.16,<4
+  - make
+  - python >=3.10,<3.14

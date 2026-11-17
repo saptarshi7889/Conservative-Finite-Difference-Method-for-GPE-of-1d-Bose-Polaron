@@ -1,4 +1,5 @@
 /build/
+/build-conda/
 /results/
 *.dat
 __pycache__/

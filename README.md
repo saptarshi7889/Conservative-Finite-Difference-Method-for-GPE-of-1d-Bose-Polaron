@@ -42,6 +42,40 @@ Requirements: a C++17 compiler, Eigen 3.3 or newer, and either Make or CMake 3.1
 Python 3 is needed only for tests. No Python packages are required. Dependencies
 must already be installed; neither local build command downloads anything.
 
+### Conda setup (Linux and macOS)
+
+The supplied `environment.yml` declares the compiler, Eigen, CMake, Make, and
+Python needed to build and test the solver in a dedicated environment:
+
+```sh
+conda env create -f environment.yml
+conda activate bose-polaron-gpe
+cmake -S . -B build-conda -DCMAKE_BUILD_TYPE=Release
+cmake --build build-conda --parallel 2
+ctest --test-dir build-conda --output-on-failure
+./build-conda/gpe --help
+```
+
+Environment creation downloads dependencies. The manifest specifies compatible
+version ranges, not an exact lockfile. Eigen is the solver's only external C++
+library; Python is used for the test driver. Plotting/animation scripts under
+`examples/` have separate optional dependencies and are not part of this setup.
+
+### Automatic tests
+
+GitHub Actions runs on every pull request opening, reopening, and update, and
+on pushes. It builds and tests with GCC and Clang and separately checks the
+Conda environment above. CTest runs direct numerical function checks (the open
+and periodic Thomas solvers against an independent dense solve, density, delta
+placement, and uniform-field velocity) and the simulation integration tests
+(restart consistency, uniform-solution conservation, output cadence, and invalid
+inputs). These tests do not establish conservation for interacting simulations.
+
+To prevent merging failed tests, configure a GitHub branch rule for `master`
+requiring these status checks after the workflow has run successfully.
+
+### Build with existing dependencies
+
 ```sh
 make EIGEN_INCLUDE=/path/to/directory/containing/Eigen
 make test

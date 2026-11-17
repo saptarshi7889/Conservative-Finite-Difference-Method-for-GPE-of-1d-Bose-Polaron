@@ -8,7 +8,11 @@ all: build/gpe
 build/gpe: src/main.cpp src/numerics.hpp
 	mkdir -p build
 	$(CXX) $(CPPFLAGS) -I"$(EIGEN_INCLUDE)" $(CXXFLAGS) src/main.cpp $(LDFLAGS) -o $@
-test: build/gpe
+build/test_numerics: tests/numerics.cpp src/numerics.hpp
+	mkdir -p build
+	$(CXX) $(CPPFLAGS) -I"$(EIGEN_INCLUDE)" $(CXXFLAGS) tests/numerics.cpp $(LDFLAGS) -o $@
+test: build/gpe build/test_numerics
+	./build/test_numerics
 	python3 tests/integration.py ./build/gpe
 install: build/gpe
 	install -Dm755 build/gpe "$(DESTDIR)$(PREFIX)/bin/gpe"

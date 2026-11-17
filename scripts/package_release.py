@@ -14,6 +14,7 @@ ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 ZIP_COMPRESSION = 9
 FILE_MODE = 0o644
 PACKAGE_PATHS = (
+    'environment.yml',
     'CMakeLists.txt', 'Makefile', 'LICENSE', 'CITATION.cff', 'README.md',
     'VALIDATION.md', 'PUBLISHING.md', 'RELEASE_NOTES.md', 'src', 'tests',
     'scripts/package_release.py', '.github/workflows', 'docs/media',
