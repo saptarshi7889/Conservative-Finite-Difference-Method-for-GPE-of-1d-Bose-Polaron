@@ -153,6 +153,8 @@ also writes plain `phi_STEP.dat` snapshots.
 [Validation and limitations](VALIDATION.md) ·
 [Release notes](RELEASE_NOTES.md) · [Maintainer publishing guide](PUBLISHING.md)
 
+[Project website source](docs/index.html) · [GitHub Pages setup](docs/PAGES.md)
+
 The original and packaged implementations matched all 251 saved velocities
 through t=25 in the L=500, V0=0.5 comparison. Both continuation implementations
 also matched all 51 saved velocities from t=20 to t=25. These checks establish
