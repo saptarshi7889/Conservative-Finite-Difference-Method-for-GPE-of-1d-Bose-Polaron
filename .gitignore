@@ -15,3 +15,6 @@ __pycache__/
 /dist/
 
 /build-library/
+
+/results_L500_v05_library_comparison/
+/results_L500_v05_library_comparison_partial_every_step/
