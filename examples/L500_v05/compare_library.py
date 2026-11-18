@@ -13,7 +13,7 @@ import tarfile
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / 'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_new_cluster_upwind_scheme_corrected.cpp'
+SOURCE = ROOT / 'legacy' / 'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_new_cluster_upwind_scheme_corrected.cpp'
 OUTPUT = ROOT / 'results_L500_v05_library_comparison'
 PARAMETERS = dict(length=500.0, dx=0.001, dt=0.01, t_final=25.0,
                   V_0=0.5, mass_ratio=0.333, G=1.0, gamma=0.1,

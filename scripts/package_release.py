@@ -15,11 +15,11 @@ ZIP_COMPRESSION = 9
 FILE_MODE = 0o644
 PACKAGE_PATHS = (
     'environment.yml', 'examples/library',
+    'examples/L500_v05/compare_library.py', 'examples/L500_v05/COMPARISON.md',
     'CMakeLists.txt', 'Makefile', 'LICENSE', 'CITATION.cff', 'README.md',
     'VALIDATION.md', 'PUBLISHING.md', 'RELEASE_NOTES.md', 'src', 'tests', 'include', 'cmake',
     'scripts/package_release.py', '.github/workflows', 'docs/media',
-    'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp',
-    'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_new_cluster_upwind_scheme_corrected.cpp',
+    'legacy',
 )
 
 
