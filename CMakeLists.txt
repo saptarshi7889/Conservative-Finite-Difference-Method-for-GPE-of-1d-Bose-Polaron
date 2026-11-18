@@ -1,15 +1,16 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.17)
 project(bose_polaron_gpe VERSION 0.1.0 LANGUAGES CXX)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(ZLIB REQUIRED)
-add_library(gpe_solver src/solver.cpp)
+find_package(LibArchive REQUIRED)
+add_library(gpe_solver src/solver.cpp src/continuation.cpp)
 add_library(gpe::solver ALIAS gpe_solver)
 set_target_properties(gpe_solver PROPERTIES EXPORT_NAME solver CXX_EXTENSIONS OFF)
 target_compile_features(gpe_solver PUBLIC cxx_std_17)
 target_include_directories(gpe_solver PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
-target_link_libraries(gpe_solver PUBLIC Eigen3::Eigen PRIVATE ZLIB::ZLIB)
+target_link_libraries(gpe_solver PUBLIC Eigen3::Eigen PRIVATE ZLIB::ZLIB LibArchive::LibArchive)
 add_executable(gpe src/main.cpp)
 target_compile_features(gpe PRIVATE cxx_std_17)
 target_link_libraries(gpe PRIVATE gpe::solver)
@@ -42,4 +43,8 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/library.py $<TARGET_FILE:test_library> $<TARGET_FILE:gpe>)
     add_test(NAME integration COMMAND ${Python3_EXECUTABLE}
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/integration.py $<TARGET_FILE:gpe>)
+    add_executable(test_continuation tests/continuation.cpp)
+    target_link_libraries(test_continuation PRIVATE gpe::solver)
+    add_test(NAME continuation COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/continuation.py $<TARGET_FILE:test_continuation>)
 endif()
