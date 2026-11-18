@@ -159,7 +159,12 @@ also matched all 51 saved velocities from t=20 to t=25. These checks establish
 implementation agreement for those runs. Conservation and grid/time convergence
 must be checked for each scientific study; see [VALIDATION.md](VALIDATION.md).
 
-[View the velocity/density animation](docs/media/velocity_density_animation.gif) ·
+## Impurity velocity and density evolution
+
+Impurity velocity with a synchronized boson-density inset in the impurity frame.
+
+![Impurity velocity and density evolution](docs/media/velocity_density_animation.gif)
+
 [Download the video](docs/media/velocity_density_animation.mp4)
 
 ## License and citation
