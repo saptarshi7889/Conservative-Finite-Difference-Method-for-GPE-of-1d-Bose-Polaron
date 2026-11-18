@@ -19,8 +19,6 @@ PARAMETERS = dict(length=500.0, dx=0.001, dt=0.01, t_final=25.0,
                   V_0=0.5, mass_ratio=0.333, G=1.0, gamma=0.1,
                   picard_tolerance=1e-8, max_picard_iterations=10,
                   config_save_every=50, velocity_save_every=10)
-EXPECTED_ROWS = 251
-EXPECTED_SNAPSHOTS = 51
 FIGURE_SIZE = (9, 7)
 DPI = 160
 
@@ -122,7 +120,14 @@ def run():
         raise RuntimeError(f'Solver failures: {failed}; partial data retained')
 
 
-def compare():
+def compare(output=OUTPUT, parameters=PARAMETERS,
+            initial_description='Initial field: phi(x)=1; periodic boundaries.',
+            reference_description='Reference: original fresh-run numerical update and routines.',
+            library_label='Library GPE_solver'):
+    t_initial = parameters.get('t_initial', 0.0)
+    total_steps = int(round((parameters['t_final']-t_initial)/parameters['dt']))
+    expected_rows = total_steps//parameters['velocity_save_every']+1
+    expected_snapshots = total_steps//parameters['config_save_every']+1
     os.environ.setdefault('MPLCONFIGDIR','/tmp/gpe-comparison-mpl')
     import numpy as np
     import matplotlib
@@ -130,62 +135,62 @@ def compare():
     import matplotlib.pyplot as plt
     from matplotlib.backends.backend_pdf import PdfPages
 
-    reference = np.loadtxt(OUTPUT/'reference/velocity.dat')
-    library = np.loadtxt(OUTPUT/'library/velocity.dat')
-    assert reference.shape == library.shape == (EXPECTED_ROWS,3)
+    reference = np.loadtxt(output/'reference/velocity.dat')
+    library = np.loadtxt(output/'library/velocity.dat')
+    assert reference.shape == library.shape == (expected_rows,3)
     assert np.isfinite(reference).all() and np.isfinite(library).all()
-    expected_times = np.arange(EXPECTED_ROWS)*PARAMETERS['velocity_save_every']*PARAMETERS['dt']
+    expected_times = t_initial + np.arange(expected_rows)*parameters['velocity_save_every']*parameters['dt']
     assert np.array_equal(reference[:,0],expected_times)
     assert np.array_equal(library[:,0],expected_times)
     difference = library[:,1:]-reference[:,1:]
     exact = np.all(difference==0,axis=1)
-    final_reference = np.fromfile(OUTPUT/'reference/final_field.bin',dtype=np.complex128)
-    final_library = np.fromfile(OUTPUT/'library/final_field.bin',dtype=np.complex128)
-    assert final_reference.shape == final_library.shape == (int(PARAMETERS['length']/PARAMETERS['dx']),)
-    stats = dict(time_points=EXPECTED_ROWS, identical_velocity_points=int(exact.sum()),
+    final_reference = np.fromfile(output/'reference/final_field.bin',dtype=np.complex128)
+    final_library = np.fromfile(output/'library/final_field.bin',dtype=np.complex128)
+    assert final_reference.shape == final_library.shape == (int(parameters['length']/parameters['dx']),)
+    stats = dict(time_points=expected_rows, identical_velocity_points=int(exact.sum()),
                  max_real_velocity_difference=float(np.max(abs(difference[:,0]))),
                  max_imaginary_velocity_difference=float(np.max(abs(difference[:,1]))),
                  final_reference_velocity=float(reference[-1,1]), final_library_velocity=float(library[-1,1]),
                  final_field_exact=bool(np.array_equal(final_reference,final_library)),
                  max_final_field_difference=float(np.max(abs(final_reference-final_library))))
     # Read every member to EOF to check complete tar contents and gzip integrity.
-    expected_names = [f'phi_{step}.dat' for step in range(0,2501,PARAMETERS['config_save_every'])]
+    expected_names = [f'phi_{step}.dat' for step in range(0,total_steps+1,parameters['config_save_every'])]
     for name in ('reference','library'):
         members = []
-        with tarfile.open(OUTPUT/name/'configurations.tar.gz','r|gz') as archive:
+        with tarfile.open(output/name/'configurations.tar.gz','r|gz') as archive:
             for member in archive:
                 members.append(member.name)
                 stream = archive.extractfile(member)
                 while stream.read(1024*1024):
                     pass
-        assert members == expected_names and len(members) == EXPECTED_SNAPSHOTS
-        subprocess.run(['gzip','-t',str(OUTPUT/name/'configurations.tar.gz')],check=True)
+        assert members == expected_names and len(members) == expected_snapshots
+        subprocess.run(['gzip','-t',str(output/name/'configurations.tar.gz')],check=True)
         stats[name+'_compressed_configurations'] = len(members)
-    np.savetxt(OUTPUT/'comparison.csv',np.column_stack((expected_times,reference[:,1:],library[:,1:],difference,exact)),
+    np.savetxt(output/'comparison.csv',np.column_stack((expected_times,reference[:,1:],library[:,1:],difference,exact)),
                delimiter=',',header='time,reference_real,reference_imag,library_real,library_imag,delta_real,delta_imag,exact',comments='',fmt='%.17g')
-    (OUTPUT/'summary.json').write_text(json.dumps(stats,indent=2)+'\n')
+    (output/'summary.json').write_text(json.dumps(stats,indent=2)+'\n')
     fig, axes = plt.subplots(2,1,figsize=FIGURE_SIZE,sharex=True)
     axes[0].plot(expected_times,reference[:,1],label='Original research update')
-    axes[0].plot(expected_times,library[:,1],'--',label='Library GPE_solver')
+    axes[0].plot(expected_times,library[:,1],'--',label=library_label)
     axes[0].set(ylabel='Impurity velocity',title='Identical parameters: V₀=0.5, L=500, Δx=0.001, Δt=0.01')
     axes[0].legend()
     axes[1].plot(expected_times,difference[:,0],label='Real velocity difference')
     axes[1].plot(expected_times,difference[:,1],'--',label='Imaginary velocity difference')
-    axes[1].set(xlabel='Time',ylabel='Library − original',title=f'{exact.sum()} / {EXPECTED_ROWS} time points exactly equal')
+    axes[1].set(xlabel='Time',ylabel='Library − original',title=f'{exact.sum()} / {expected_rows} time points exactly equal')
     axes[1].legend()
     fig.tight_layout()
-    fig.savefig(OUTPUT/'velocity_comparison.png',dpi=DPI)
-    with PdfPages(OUTPUT/'comparison_report.pdf') as pdf:
+    fig.savefig(output/'velocity_comparison.png',dpi=DPI)
+    with PdfPages(output/'comparison_report.pdf') as pdf:
         pdf.savefig(fig)
         page = plt.figure(figsize=FIGURE_SIZE)
         details = ('Velocity regression comparison\n\n'
-                   + '\n'.join(f'{key}: {value}' for key,value in PARAMETERS.items())
-                   + '\nInitial field: phi(x)=1; periodic boundaries.\n\n'
+                   + '\n'.join(f'{key}: {value}' for key,value in parameters.items())
+                   + '\n'+initial_description+'\n\n'
                    + '\n'.join(f'{key}: {value}' for key,value in stats.items())
-                   + '\n\nReference: original fresh-run numerical update and routines.\n'
+                   + '\n\n'+reference_description+'\n'
                    'Only parameters, stopping and output handling were adapted.\n'
                    'Both compiled using the same g++ -O3 -DNDEBUG and Eigen.\n'
-                   'All 251 saved times checked at round-trip double precision.\n'
+                   f'All {expected_rows} saved times checked at round-trip double precision.\n'
                    'This checks equivalence for this run, not physical convergence\n'
                    'or conservation. No literature or novelty assessment is involved.\n'
                    'Full pointwise evidence: comparison.csv; provenance: manifest.json.')
