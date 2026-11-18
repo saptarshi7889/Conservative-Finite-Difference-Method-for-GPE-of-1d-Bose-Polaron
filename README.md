@@ -5,18 +5,57 @@ Eqs. (5) and (6) of [Majumdar and Petković, arXiv:2507.10402v2](https://arxiv.o
 The method uses periodic boundaries, a cyclic Thomas solver, and Picard iteration
 for the nonlinear update, with a velocity-dependent one-sided spatial stencil.
 
-The command-line program supports both a uniform initial field, `phi(x)=1`, and
-continuation from a saved field. The two supplied research programs remain
-unchanged in the repository root. `src/numerics.hpp` preserves their shared
-numerical routines (copied from the fresh-run program); `src/solver.cpp` retains
-the fresh-run update equations behind a callable C++ library; `src/main.cpp`
-provides its command-line driver.
+For your own simulations, use the public C++ interface in
+[`include/gpe/solver.hpp`](include/gpe/solver.hpp): set
+`gpe::SimulationParameters` and call `gpe::GPE_solver`. The library supports
+both a uniform initial field, `phi(x)=1`, and continuation from a saved field.
+It is a **compiled library**: include the public header and link your program
+to `gpe::solver`, which supplies the implementation and its dependencies.
+
+The original research programs are preserved unchanged in [`legacy/`](legacy)
+for reference and regression comparisons. The supported interface for new
+simulation programs is the public header. `src/numerics.hpp` contains internal
+numerical routines, `src/solver.cpp` implements the library, and `src/main.cpp`
+provides the optional command-line driver.
 
 **Numerical status:** the packaged update matches the supplied fresh-run code
-exactly in a small regression case. This does not establish exact particle-number
+exactly in a small regression case and at all 251 saved velocity points of the
+L=500, V0=0.5 run through t=25. This does not establish exact particle-number
 conservation: the short interacting example exhibits relative drift of about
 `5.5e-5`. Check conservation and convergence for each scientific run. See
 [VALIDATION.md](VALIDATION.md).
+
+## Start your own simulation
+
+Use this pattern in your C++ program:
+
+```cpp
+#include <gpe/solver.hpp>
+
+int main() {
+    gpe::SimulationParameters parameters;
+    // Small demonstration; choose physical and numerical parameters for your study.
+    parameters.output_directory = "my-simulation";
+    const auto result = gpe::GPE_solver(parameters);
+}
+```
+
+In a CMake project with this repository checked out under `bose-polaron-gpe/`:
+
+```cmake
+cmake_minimum_required(VERSION 3.17)
+project(my_simulation LANGUAGES CXX)
+add_subdirectory(bose-polaron-gpe)
+add_executable(simulation main.cpp)
+target_link_libraries(simulation PRIVATE gpe::solver)
+```
+
+Build with `cmake -S . -B build -DBUILD_TESTING=OFF` and
+`cmake --build build --target simulation`.
+The [build requirements](#build) must already be available. See
+[C++ library](#c-library) below for all parameters, output files, continuation,
+and the installed-package alternative. [`examples/library/`](examples/library)
+contains a complete example using an installed package.
 
 ## Simulation example
 
@@ -34,7 +73,7 @@ $10^{-8}$, and at most 10 iterations per step. Playback is accelerated.
 ## Releases
 
 Versioned source downloads are published on the [GitHub Releases page](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases).
-See [RELEASE_NOTES.md](RELEASE_NOTES.md) for v0.1.0 requirements and numerical
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for v0.2.0 requirements and numerical
 limitations. Eigen is an external dependency; precompiled binaries are not included.
 
 ## Build

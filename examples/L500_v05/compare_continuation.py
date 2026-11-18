@@ -11,7 +11,7 @@ import time
 from compare_library import compare
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / 'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp'
+SOURCE = ROOT / 'legacy' / 'finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp'
 PREVIOUS = ROOT / 'results_L500_v05_library_comparison'
 CHECKPOINT = PREVIOUS / 'library/configurations.tar.gz'
 CHECKPOINT_MEMBER = 'phi_2000.dat'
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
                     checkpoint_file=str(CHECKPOINT), checkpoint_member=CHECKPOINT_MEMBER,
                     checkpoint_sha256=digest.hexdigest(),
                     source_sha256={name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
-                                   for name in (SOURCE.name, 'src/solver.cpp', 'src/continuation.cpp', 'src/numerics.hpp')},
+                                   for name in (str(SOURCE.relative_to(ROOT)), 'src/solver.cpp', 'src/continuation.cpp', 'src/numerics.hpp')},
                     eigen=str(eigen), libarchive_prefix=str(archive_prefix),
                     compiler=subprocess.check_output(['g++','--version'],text=True),
                     reference_adjustments='Parameters, checkpoint filename/velocity, integer step count, output and stopping only. Original reader, numerical routines and update retained. Temporary plain input removed after loading. Library reads original compressed archive directly.')

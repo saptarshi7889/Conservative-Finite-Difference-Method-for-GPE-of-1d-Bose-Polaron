@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(bose_polaron_gpe VERSION 0.1.0 LANGUAGES CXX)
+project(bose_polaron_gpe VERSION 0.2.0 LANGUAGES CXX)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(ZLIB REQUIRED)
 find_package(LibArchive REQUIRED)

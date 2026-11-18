@@ -1,18 +1,26 @@
-# v0.1.0 — Bose-polaron GPE solver
+# v0.2.0 — Public C++ library and legacy source organization
 
-Initial source release of the C++17 solver for a one-dimensional Bose polaron.
+Use `<gpe/solver.hpp>` and link to `gpe::solver` to run your own simulations.
+The README now leads with a minimal C++ example and CMake integration.
 
-- Periodic finite differences, cyclic Thomas solves, and Picard iteration.
-- Uniform initial fields and restart from saved configurations and velocities.
-- Independent configuration and velocity save intervals, flushed diagnostics,
-  and complete configuration files published by atomic rename.
-- Make/CMake builds, integration tests, and documented numerical equations.
-- Both original research programs and the synchronized simulation animation.
+- The public compiled library provides parameter configuration, uniform or
+  supplied initial fields, in-memory continuation, streamed velocities, and
+  incrementally compressed configuration archives.
+- Both original C++ research programs are moved unchanged into `legacy/`.
+  Comparison/continuation scripts and source packaging use the new paths.
+- The completed L=500, V0=0.5 comparison through t=25 found exact agreement at
+  all 251 saved complex velocities and in the complete final field.
+- The optional CLI, Make/CMake builds, tests, and animation remain available.
+
+This release changes source organization and documentation; it does not change
+the numerical update. Code that directly uses the historical source paths must
+use their new `legacy/` locations. The public header path remains
+`gpe/solver.hpp`; its implementation is compiled from `src/`.
 
 ## Download and build
 
-Download `bose-polaron-gpe-0.1.0.tar.gz` or `.zip` and extract it. Install a
-C++17 compiler and Eigen 3.3+ using your preferred environment, then run:
+Download `bose-polaron-gpe-0.2.0.tar.gz` or `.zip` and extract it. With an
+existing C++17 compiler, Eigen 3.3+, zlib, and libarchive development headers/libraries, run:
 
 ```sh
 make EIGEN_INCLUDE=/path/to/directory/containing/Eigen
@@ -22,9 +30,9 @@ make test
 ```
 
 On systems with Eigen under `/usr/include/eigen3`, plain `make` is sufficient.
-CMake 3.16+ is an alternative; see README.md. Python 3 is needed for tests;
+CMake 3.17+ is an alternative; see README.md. Python 3 is needed for tests;
 no Python packages are required for the solver or integration tests.
-Eigen is not bundled. This release contains source, not precompiled executables.
+Eigen, zlib, and libarchive are not bundled. This release contains source, not precompiled executables.
 `SHA256SUMS` covers the two named release archives:
 
 ```sh

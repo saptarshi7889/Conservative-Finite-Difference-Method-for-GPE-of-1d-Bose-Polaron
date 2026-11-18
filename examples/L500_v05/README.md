@@ -40,7 +40,7 @@ and remain in the same results directory. Save intervals and compression are
 unchanged. A temporary decompressed restart file is removed after loading.
 
 The executable is compiled from the numerical routines and time-update block of
-`finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp`,
+`legacy/finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp`,
 using `prepare_continuation.py` to add the validated restart/output driver from
 src/main.cpp. The original research file is unchanged. The generated driver
 checks convergence, stops exactly at t=20, flushes velocities, appends without
