@@ -41,6 +41,25 @@ reference source is now under `legacy/`. Full trajectories and comparison
 artifacts are local data excluded from Git and release packages. This checks
 implementation equivalence for the stated run, not conservation or convergence.
 
+## Compressed-file continuation
+
+On 2026-11-18, the new `GPE_solver_contd` interface passed split-run tests using
+single gzip/XZ fields and gzip/XZ tar archives, with no files extracted by the
+reader. Tests cover both velocity signs, input spanning multiple read buffers,
+grid/row-count validation, missing or duplicate archive members, truncated
+streams, nonfinite data, and missing continuation parameters. All four CTest
+suites passed; `make test` also passed from an extracted source package. The
+installed-library example successfully ran a fresh simulation and continued
+directly from its compressed archive.
+
+A separate temporary driver retained the original continuation program's
+numerical routines and update block. For L=16, dx=0.125, dt=0.001, m/M=0.125,
+G=-1.5, gamma=0.1, tolerance=1e-8 and iteration limit=12, evolution from t=0.01
+to t=0.02 agreed exactly in the final field with the new interface, for both
+V0=+2 and V0=-2. Both began from the same checkpoint field and velocity. This
+original-source check was local and is not part of the automated test suite.
+These checks do not establish long-time convergence or conservation.
+
 ## Conservation finding
 
 For the default interacting test (L=16, dx=0.125, dt=0.001, T=0.02,
@@ -59,8 +78,8 @@ parameter sweeps remain the responsibility of the scientific user.
 
 ## v0.2.0 release checks
 
-On 2026-11-18, a fresh GCC 15.2.0 Release build passed all three CTest suites
-(numerics, library, integration). The new README C++ and CMake example was
+On 2026-11-18, a fresh GCC 15.2.0 Release build passed all four CTest suites
+(numerics, library, integration, continuation). The new README C++ and CMake example was
 compiled and run as a separate consumer project. Source tar/zip contents and
 SHA-256 checksums were verified, and the extracted source archive passed
 `make test`. Both programs moved into `legacy/` were checked byte-for-byte

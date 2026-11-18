@@ -43,7 +43,7 @@ int main() {
 In a CMake project with this repository checked out under `bose-polaron-gpe/`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.17)
 project(my_simulation LANGUAGES CXX)
 add_subdirectory(bose-polaron-gpe)
 add_executable(simulation main.cpp)
@@ -78,13 +78,15 @@ limitations. Eigen is an external dependency; precompiled binaries are not inclu
 
 ## Build
 
-Requirements: a C++17 compiler, Eigen 3.3 or newer, zlib development headers/library, and either Make or CMake 3.16+.
+Requirements: a C++17 compiler, Eigen 3.3 or newer, zlib and libarchive
+development headers/libraries, and either Make or CMake 3.17+.
+Libarchive must provide built-in gzip and XZ support for compressed continuation.
 Python 3 is needed only for tests. No Python packages are required. Dependencies
 must already be installed; neither local build command downloads anything.
 
 ### Conda setup (Linux and macOS)
 
-The supplied `environment.yml` declares the compiler, Eigen, zlib, CMake, Make, and
+The supplied `environment.yml` declares the compiler, Eigen, zlib, libarchive, CMake, Make, and
 Python needed to build and test the solver in a dedicated environment:
 
 ```sh
@@ -97,7 +99,8 @@ ctest --test-dir build-conda --output-on-failure
 ```
 
 Environment creation downloads dependencies. The manifest specifies compatible
-version ranges, not an exact lockfile. Eigen and zlib are the solver dependencies; Python is used for the test driver. Plotting/animation scripts under
+version ranges, not an exact lockfile. Eigen, zlib, and libarchive are the solver
+dependencies; Python is used for the test driver. Plotting/animation scripts under
 `examples/` have separate optional dependencies and are not part of this setup.
 
 ### Automatic tests
@@ -230,8 +233,56 @@ cmake --build build-library/example --parallel 2
 
 The consumer uses `find_package(gpe CONFIG REQUIRED)` followed by
 `target_link_libraries(your_target PRIVATE gpe::solver)`. See
-[`examples/library`](examples/library) for a complete example. Eigen and zlib
+[`examples/library`](examples/library) for a complete example. Eigen, zlib, and libarchive
 must also be discoverable when configuring the consumer.
+
+### Continue directly from a compressed checkpoint
+
+Include `<gpe/GPE_solver_contd.hpp>` and link to the same compiled target
+`gpe::solver`. `GPE_solver_contd` loads the initial field from a compressed file
+on the same machine, then uses the existing numerical evolution:
+
+```cpp
+#include <gpe/GPE_solver_contd.hpp>
+
+// Retain the physical/grid parameters of the original run in parameters.
+parameters.t_initial = checkpoint_time;       // Must be positive.
+parameters.t_final = next_final_time;
+parameters.initial_velocity = checkpoint_velocity;
+parameters.output_directory = "continued-simulation";
+// Leave parameters.initial_field empty; the checkpoint supplies it.
+const std::filesystem::path checkpoint_file = "/path/to/checkpoints/phi_1000.dat.xz";
+auto continued = gpe::GPE_solver_contd(parameters, checkpoint_file);
+```
+
+For the library's `configurations.tar.gz`, provide the exact snapshot member:
+
+```cpp
+auto continued = gpe::GPE_solver_contd(
+    parameters, "/path/to/previous-run/configurations.tar.gz", "phi_1000.dat");
+```
+
+Supported inputs are single `.dat.gz` or `.dat.xz` fields and gzip/XZ-compressed
+tar archives. The file contents determine the format. For tar archives,
+`checkpoint_member` is required; for single compressed fields, omit it.
+No files are extracted: libarchive decompresses sequentially through a 64 KiB
+text buffer into one Eigen field vector. Memory also includes the compression
+decoder's buffers/dictionary and the solver's usual working vectors. The full
+expanded text and the archive's other fields are never retained in memory.
+Reading a later member requires scanning earlier entries; the reader scans the
+archive to its end to reject duplicate selected member names.
+
+Supply the **instantaneous checkpoint velocity**, while retaining the original
+injection velocity in `V_0`. The three-column field contains no time or physical
+parameter metadata: matching `t_initial`, `V_0`, mass ratio, coupling, gamma,
+dx, and dt to the original run remains the caller's responsibility. The reader
+checks grid coordinates, row count, finite field values, and reports decompression
+errors. Legacy low-precision snapshots retain their original rounding error.
+
+Output uses a new directory, compressed configurations, and streamed velocity
+records as for `GPE_solver`. Times start at `t_initial`; snapshot step numbers
+start at zero for the continued segment. The example under `examples/library/`
+demonstrates a complete fresh run followed by compressed-file continuation.
 
 ## Fresh run
 

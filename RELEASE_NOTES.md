@@ -20,7 +20,7 @@ use their new `legacy/` locations. The public header path remains
 ## Download and build
 
 Download `bose-polaron-gpe-0.2.0.tar.gz` or `.zip` and extract it. With an
-existing C++17 compiler, Eigen 3.3+, and zlib development headers/library, run:
+existing C++17 compiler, Eigen 3.3+, zlib, and libarchive development headers/libraries, run:
 
 ```sh
 make EIGEN_INCLUDE=/path/to/directory/containing/Eigen
@@ -30,9 +30,9 @@ make test
 ```
 
 On systems with Eigen under `/usr/include/eigen3`, plain `make` is sufficient.
-CMake 3.16+ is an alternative; see README.md. Python 3 is needed for tests;
+CMake 3.17+ is an alternative; see README.md. Python 3 is needed for tests;
 no Python packages are required for the solver or integration tests.
-Eigen and zlib are not bundled. This release contains source, not precompiled executables.
+Eigen, zlib, and libarchive are not bundled. This release contains source, not precompiled executables.
 `SHA256SUMS` covers the two named release archives:
 
 ```sh

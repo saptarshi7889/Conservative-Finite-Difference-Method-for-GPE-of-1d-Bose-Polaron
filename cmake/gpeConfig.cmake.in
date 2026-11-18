@@ -2,4 +2,5 @@
 include(CMakeFindDependencyMacro)
 find_dependency(Eigen3 3.3 NO_MODULE)
 find_dependency(ZLIB)
+find_dependency(LibArchive)
 include("${CMAKE_CURRENT_LIST_DIR}/gpeTargets.cmake")

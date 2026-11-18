@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.17)
 project(gpe_library_example LANGUAGES CXX)
 find_package(gpe CONFIG REQUIRED)
 add_executable(simulation main.cpp)

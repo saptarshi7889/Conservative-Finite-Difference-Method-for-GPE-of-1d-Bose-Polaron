@@ -5,7 +5,8 @@ channels:
 dependencies:
   - cxx-compiler
   - eigen >=3.3,<4
-  - cmake >=3.16,<4
+  - cmake >=3.17,<4
   - zlib >=1.2,<2
+  - libarchive >=3.6,<4
   - make
   - python >=3.10,<3.14
