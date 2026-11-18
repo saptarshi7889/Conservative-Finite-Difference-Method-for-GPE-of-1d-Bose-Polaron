@@ -6,7 +6,7 @@ implementations used for numerical comparisons.
 
 For new simulations, include `<gpe/solver.hpp>`, set
 `gpe::SimulationParameters`, call `gpe::GPE_solver`, and link to the CMake target
-`gpe::solver`. See the [main README](../README.md#start-your-own-simulation).
+`gpe::solver`. See the [main README](../README.md#3-run-your-own-c-simulation).
 The public header is the interface to a compiled library; the implementation
 is built from `src/`.
 

@@ -1,3 +1,11 @@
+# Recorded comparison results
+
+Generated trajectories, build outputs, and reports are not included in the
+clean source tree. The results below record completed local checks. Regenerate
+with the scripts described here; the continuation comparison needs the fresh
+comparison's saved t=20 checkpoint. For routine use, start with the
+[public-library example](../library/main.cpp).
+
 Run `compare_library.py --eigen /path/to/include/eigen3` from a Python
 installation with existing NumPy and Matplotlib. The script installs nothing.
 It refuses to overwrite `results_L500_v05_library_comparison/`.

@@ -18,7 +18,7 @@ PACKAGE_PATHS = (
     'examples/L500_v05/compare_library.py', 'examples/L500_v05/compare_continuation.py', 'examples/L500_v05/COMPARISON.md',
     'CMakeLists.txt', 'Makefile', 'LICENSE', 'CITATION.cff', 'README.md',
     'VALIDATION.md', 'PUBLISHING.md', 'RELEASE_NOTES.md', 'src', 'tests', 'include', 'cmake',
-    'scripts/package_release.py', '.github/workflows', 'docs/media',
+    'scripts/package_release.py', '.github/workflows', 'docs',
     'legacy',
 )
 

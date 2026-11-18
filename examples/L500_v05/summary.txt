@@ -1,7 +1,0 @@
-Stopped at t=10; no further evolution launched.
-Final velocity: 0.281138321543
-Velocity records: 101 (every 0.1 time units, including t=0)
-Compressed configurations: 21 (every 0.5, including t=0)
-Max Picard iterations: 7
-Max accepted iterate difference: 9.9881355877e-09
-Max sampled relative particle-number drift: 3.75835575595e-06
