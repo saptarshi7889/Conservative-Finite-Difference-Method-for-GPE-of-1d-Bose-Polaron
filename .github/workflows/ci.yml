@@ -10,7 +10,7 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: conda-incubator/setup-miniconda@v3
         with:
           environment-file: environment.yml
@@ -22,18 +22,32 @@ jobs:
         run: cmake --build build --parallel 2
       - name: Test functions and simulations
         run: ctest --test-dir build --output-on-failure
+      - name: Test installed library consumer
+        run: |
+          cmake --install build --prefix "$RUNNER_TEMP/gpe-install"
+          cmake -S examples/library -B consumer-build -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/gpe-install" -DCMAKE_BUILD_TYPE=Release
+          cmake --build consumer-build --parallel 2
+          cd consumer-build
+          ./simulation
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         compiler: [g++, clang++]
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Eigen
-        run: sudo apt-get update && sudo apt-get install -y libeigen3-dev
+      - uses: actions/checkout@v5
+      - name: Install Eigen and zlib
+        run: sudo apt-get update && sudo apt-get install -y libeigen3-dev zlib1g-dev
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
       - name: Build
         run: cmake --build build --parallel 2
       - name: Test
         run: ctest --test-dir build --output-on-failure
+      - name: Test installed library consumer
+        run: |
+          cmake --install build --prefix "$RUNNER_TEMP/gpe-install"
+          cmake -S examples/library -B consumer-build -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/gpe-install" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+          cmake --build consumer-build --parallel 2
+          cd consumer-build
+          ./simulation
