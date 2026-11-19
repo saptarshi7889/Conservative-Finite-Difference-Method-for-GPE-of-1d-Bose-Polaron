@@ -19,7 +19,7 @@ with tempfile.TemporaryDirectory() as directory:
         library = root / name
         cli = root / (name + '_cli')
         subprocess.run([CLI, '--output', str(cli), '--velocity', velocity,
-                        '--velocity-every', '5'], check=True)
+                        '--velocity-every', '5', '--force', '7'], check=True)
         assert (library / 'velocity.dat').read_bytes() == (cli / 'velocity.dat').read_bytes()
         rows = [line.split() for line in (library / 'velocity.dat').read_text().splitlines()
                 if not line.startswith('#')]

@@ -82,6 +82,19 @@ target_link_libraries(simulation PRIVATE gpe::solver)
 
 Pass the library installation directory through `-DCMAKE_PREFIX_PATH` as above.
 
+## Constant-force impurity
+
+The current source supports `--force F` (default zero) and
+`SimulationParameters::force`. It follows the supplied adiabatic research code:
+the velocity drive is `V_0 + (m/M)*F*t`, with the existing boson momentum
+contribution added. Set `--velocity 0` for a driven impurity initially at rest.
+The initial field defaults to uniform, including for nonzero coupling.
+
+See [the F=7 example](examples/F7/README.md) for the requested large-grid
+parameters, compressed output, and the observed Picard convergence failure.
+These additions are in the working source; the v0.2.0 release linked above
+does not include them.
+
 ## 4. Continue from a compressed checkpoint
 
 Include **`<gpe/GPE_solver_contd.hpp>`** and retain the physical/grid parameters

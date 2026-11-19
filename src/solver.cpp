@@ -15,7 +15,7 @@ gpe::SimulationResult gpe::GPE_solver(const SimulationParameters& parameters) {
     const int iterations=parameters.max_picard_iterations, saving=parameters.config_save_every;
     const int velocity_saving=parameters.velocity_save_every;
     for (double value : {Length, delta_x, delta_t, t_init, t_fin, m_tilde, G_tilde,
-                         gamma, err_iter, parameters.V_0})
+                         gamma, err_iter, parameters.V_0, parameters.force})
         if (!isfinite(value)) throw runtime_error("Parameters must be finite.");
     const double points=Length/delta_x, steps=(t_fin-t_init)/delta_t;
     if (!(Length>0 && delta_x>0 && delta_t>0 && t_init>=0 && t_fin>t_init && gamma>0 && m_tilde>=0 && err_iter>0)
@@ -50,6 +50,8 @@ gpe::SimulationResult gpe::GPE_solver(const SimulationParameters& parameters) {
     }
     metadata<<"length "<<Length<<"\ndx "<<delta_x<<"\ndt "<<delta_t<<"\nmass_ratio "<<m_tilde
               <<"\ncoupling "<<G_tilde<<"\ngamma "<<gamma<<"\nvelocity_0 "<<real(V_0)
+              <<"\nforce "<<parameters.force
+              <<"\naccept_unconverged_steps "<<parameters.accept_unconverged_steps
               <<"\nstart "<<t_init<<"\nend "<<t_fin<<"\ntolerance "<<err_iter<<"\niterations "<<K_fin
               <<"\nsave_every "<<save_every<<"\nvelocity_every "<<velocity_every<<"\nrestart_velocity "<<real(V)<<"\nrestart_velocity_imag "<<imag(V)<<"\n";
     metadata.flush();
@@ -169,15 +171,25 @@ gpe::SimulationResult gpe::GPE_solver(const SimulationParameters& parameters) {
                Phi_k = Phi_hat;//Phi^{n+1}_k obtained
            }
        }
-         if (k > K_fin || !Phi_hat.allFinite())
-             throw runtime_error("Nonlinear iteration failed at time " + to_string(t));
+         if ((k > K_fin && !parameters.accept_unconverged_steps)
+             || !Phi_hat.allFinite() || !isfinite(Error_iter.norm()))
+             {
+                 ostringstream message;
+                 message << setprecision(OUTPUT_PRECISION)
+                         << "Nonlinear iteration failed at time " << t_init+count*delta_t
+                         << " after " << min(k,K_fin) << " iterations; residual "
+                         << Error_iter.norm() << ", tolerance " << err_iter;
+                 throw runtime_error(message.str());
+             }
          Phi_n1 = Phi_hat;//Phi_{n+1} obtained
          Error_config = Phi_n1 - Phi_n;//measuring difference between the two configs in two consecutive TIME STEPS (NOT ITERATION STEPS)
          //new velocity calculation and file
-         V = Velocity_calculation(Phi_n,Phi_n1,space_points,V_0,m_tilde,gamma);//Velocity writing
+         V = Velocity_calculation(Phi_n,Phi_n1,space_points,
+             V_0 + m_tilde*parameters.force*(t_init+count*delta_t),m_tilde,gamma);//Velocity writing
          
         Phi_n=Phi_n1;
-        convergence<<t+delta_t<<" "<<k<<" "<<Error_iter.norm()<<"\n";
+        convergence<<t+delta_t<<" "<<min(k,K_fin)<<" "<<Error_iter.norm()<<"\n";
+        convergence.flush();
         if (count%velocity_every==0 || count==total_steps) record_velocity(t_init+count*delta_t);
         if (count%save_every==0 || count==total_steps) record(t_init+count*delta_t,count);
     }

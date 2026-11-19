@@ -10,6 +10,7 @@ constexpr int CONFIG_INTERVAL = 10;
 constexpr int VELOCITY_INTERVAL = 5;
 constexpr double LIVE_END_TIME = 1000.0;
 constexpr int LIVE_CONFIG_INTERVAL = 1000000;
+constexpr double TEST_FORCE = 7.0;
 constexpr double VELOCITIES[] = {2.0, -2.0};
 void require(bool condition, const char* message) {
     if (!condition) throw std::runtime_error(message);
@@ -32,6 +33,7 @@ int main(int argc, char** argv) {
         const std::string name=velocity>0 ? "positive" : "negative";
         gpe::SimulationParameters p;
         p.V_0=velocity;
+        p.force=TEST_FORCE;
         p.config_save_every=CONFIG_INTERVAL;
         p.velocity_save_every=VELOCITY_INTERVAL;
         p.output_directory=root/name;
@@ -53,6 +55,21 @@ int main(int argc, char** argv) {
         require(std::abs(resumed.final_velocity-full.final_velocity)<RESTART_TOLERANCE,
                 "Library restart changes final velocity");
     }
+    gpe::SimulationParameters free;
+    free.G=0;
+    free.V_0=0;
+    free.force=TEST_FORCE;
+    free.output_directory=root/"free_force";
+    const auto accelerated=gpe::GPE_solver(free);
+    require(std::abs(accelerated.final_velocity-free.mass_ratio*TEST_FORCE*free.t_final)
+            <RESTART_TOLERANCE, "Free impurity acceleration is incorrect");
+    gpe::SimulationParameters capped;
+    capped.max_picard_iterations=1;
+    capped.accept_unconverged_steps=true;
+    capped.output_directory=root/"accepted_cap";
+    const auto accepted=gpe::GPE_solver(capped);
+    require(accepted.final_time==capped.t_final && accepted.final_field.allFinite(),
+            "Explicitly accepted capped steps must complete with a finite field");
     gpe::SimulationParameters bad;
     bad.output_directory=root/"bad";
     bad.initial_field=Eigen::VectorXcd::Ones(3);

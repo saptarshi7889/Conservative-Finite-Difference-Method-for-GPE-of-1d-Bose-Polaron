@@ -17,6 +17,7 @@ constexpr double DEFAULT_END = 0.02;
 constexpr double DEFAULT_MASS_RATIO = 0.125;
 constexpr double DEFAULT_COUPLING = -1.5;
 constexpr double DEFAULT_GAMMA = 0.1;
+constexpr double DEFAULT_FORCE = 0.0;
 constexpr double DEFAULT_VELOCITY = 2.0;
 constexpr double DEFAULT_TOLERANCE = 1e-8;
 constexpr int DEFAULT_ITERATIONS = 12;
@@ -25,7 +26,7 @@ constexpr double GRID_TOLERANCE = 1e-9;
 
 void usage() {
     cout << "Usage: gpe [--length L] [--dx DX] [--dt DT] [--end T]\n"
-         << "  [--mass-ratio m/M] [--coupling G] [--gamma GAMMA] [--velocity V0]\n"
+         << "  [--mass-ratio m/M] [--coupling G] [--gamma GAMMA] [--velocity V0] [--force F]\n"
          << "  [--tolerance E] [--iterations K] [--save-every N] [--velocity-every N] [--output DIR]\n"
          << "  [--restart PHI_FILE --start T --restart-velocity V]\n"
          << "Restart requires the same physical and grid parameters, original V0,\n"
@@ -36,7 +37,7 @@ void usage() {
 int main(int argc, char** argv) {
  try {
     map<string,string> args;
-    const string allowed = " length dx dt end mass-ratio coupling gamma velocity tolerance iterations save-every velocity-every output restart start restart-velocity ";
+    const string allowed = " length dx dt end mass-ratio coupling gamma velocity tolerance iterations save-every velocity-every output restart start restart-velocity force ";
     for (int j=1; j<argc; ++j) {
         string key=argv[j];
         if (key=="--help") { usage(); return 0; }
@@ -96,6 +97,7 @@ int main(int argc, char** argv) {
     settings.mass_ratio=m_tilde; settings.G=G_tilde; settings.gamma=gamma;
     settings.picard_tolerance=err_iter; settings.max_picard_iterations=K_fin;
     settings.config_save_every=save_every; settings.velocity_save_every=velocity_every;
+    settings.force=number("--force",DEFAULT_FORCE);
     settings.V_0=real(V_0); settings.initial_velocity=V; settings.initial_field=Phi_n;
     settings.output_directory=args.count("--output") ? args.at("--output") : "results";
     settings.write_plain_snapshots=true;
