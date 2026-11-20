@@ -96,8 +96,8 @@ void Thomas_tridiagonal_solver_PBC(Ref<VectorXcd> a,  complex<double> a1, comple
     Thomas_tridiagonal_solver(q,a1,b_new,c1,u,L);
     //actual solution
     complex<double> x1,x2,x3;
-    x1 = v.transpose()*y;
-    x2 = v.transpose()*q;
+    x1 = (v.transpose()*y).value();
+    x2 = (v.transpose()*q).value();
     x2 = x2 + (1.0+0.0*I);
     x3 = x1/x2;
     a = y - x3*q;

@@ -23,11 +23,19 @@ GRID_TOLERANCE = 1e-9
 POSITION_TOLERANCE = 0.000051
 SNAPSHOT_INTERVAL = 2.5
 FINAL_TIME = 40.0
-FPS = 5
-FRAME_DURATION_MS = 1000 // FPS
+BASE_FPS = 5
+PLAYBACK_SPEED = 1.5
+FPS = BASE_FPS * PLAYBACK_SPEED
+FPS_NUMERATOR = 15
+FPS_DENOMINATOR = 2
+GIF_TIME_QUANTUM_MS = 10
+VELOCITY_INITIALS = (0.5, 1.0, 1.5, 2.5, 3.5, 4.0, 6.0, 6.5)
+VELOCITY_COLORS = ("#e32929", "#c69200", "#2455cf", "#303030", "#7025a8", "#258130", "#29b9e8", "#ef2190")
+LEGEND_COLUMNS = 4
+LEGEND_FONT_SIZE = 9
 FIGURE_SIZE = (12, 7)
 DPI = 120
-INSET_BOUNDS = (0.47, 0.10, 0.50, 0.30)
+INSET_BOUNDS = (0.47, 0.45, 0.50, 0.30)
 INSET_FONT_SIZE = 9
 INSET_BORDER_COLOR = 'black'
 INSET_BORDER_WIDTH = 0.8
@@ -106,6 +114,12 @@ def main():
     data = np.load(OUTPUT/'plot_data.npz')
     positions, densities, times = data['positions'], data['densities'], data['times']
     velocity = data['velocity']
+    velocity_data = np.load(OUTPUT/'all_velocities.npz')
+    velocities = [velocity_data[f'v{initial:g}'] for initial in VELOCITY_INITIALS]
+    for initial, values in zip(VELOCITY_INITIALS, velocities):
+        assert values[0, 0] == 0 and values[-1, 0] == FINAL_TIME
+        assert abs(values[0, 1]-initial) < GRID_TOLERANCE
+        assert np.all(np.diff(values[:, 0]) > 0) and np.isfinite(values).all()
     metadata = json.loads((OUTPUT/'source_manifest.json').read_text())
     files = metadata['snapshot_members']
     assert len(times) == EXPECTED_FRAMES
@@ -120,12 +134,20 @@ def main():
     fig.subplots_adjust(left=SUBPLOT_MARGINS[0], right=SUBPLOT_MARGINS[1],
                         bottom=SUBPLOT_MARGINS[2], top=SUBPLOT_MARGINS[3])
     ax.set(xlim=(velocity[0, 0], times[-1]),
-           ylim=(velocity[:, 1].min()-VELOCITY_PADDING, velocity[:, 1].max()+VELOCITY_PADDING),
+           ylim=(min(values[:, 1].min() for values in velocities)-VELOCITY_PADDING,
+                 max(values[:, 1].max() for values in velocities)+VELOCITY_PADDING),
            xlabel=r'$tgn_0/\hbar$', ylabel=r'Impurity velocity $V/v$')
     ax.grid(alpha=GRID_ALPHA)
     ax.spines[['top', 'right']].set_visible(False)
-    history, = ax.plot([], [], color=VELOCITY_COLOR, linewidth=LINE_WIDTH)
-    marker, = ax.plot([], [], 'D', color=CURRENT_COLOR, markersize=MARKER_SIZE)
+    histories, markers = [], []
+    for initial, color in zip(VELOCITY_INITIALS, VELOCITY_COLORS):
+        history, = ax.plot([], [], color=color, linewidth=LINE_WIDTH,
+                           label=rf'$V_0/v={initial:g}$')
+        marker, = ax.plot([], [], 'D', color=CURRENT_COLOR, markersize=MARKER_SIZE)
+        histories.append(history)
+        markers.append(marker)
+    ax.legend(loc='upper right', ncol=LEGEND_COLUMNS, fontsize=LEGEND_FONT_SIZE,
+              frameon=False)
     cursor = ax.axvline(times[0], color=CURRENT_COLOR, alpha=CURSOR_ALPHA, linewidth=GUIDE_LINE_WIDTH)
     inset = ax.inset_axes(INSET_BOUNDS)
     inset.set_facecolor('white')
@@ -154,13 +176,13 @@ def main():
                                     textcoords='offset points', fontsize=INSET_FONT_SIZE,
                                     color=IMPURITY_EDGE,
                                     arrowprops=dict(arrowstyle='-', color=IMPURITY_EDGE))
-    inset.text(*ANNOTATION_POSITION, 'BOSON DENSITY', transform=inset.transAxes,
+    inset.text(*ANNOTATION_POSITION, r'BOSON DENSITY · $V_0/v=1.5$ only', transform=inset.transAxes,
                color=BOSON_COLOR, fontsize=INSET_FONT_SIZE)
     intro_label = inset.text(*INTRO_LABEL_POSITION, '', transform=inset.transAxes, ha='left',
                              color=IMPURITY_EDGE, fontsize=INSET_FONT_SIZE)
     fig.suptitle('Impurity velocity and boson density', x=TITLE_POSITION[0], y=TITLE_POSITION[1], ha='left', fontsize=MAIN_TITLE_SIZE)
     clock = fig.text(*CLOCK_POSITION, '', ha='right', fontsize=CLOCK_SIZE, color=VELOCITY_COLOR)
-    fig.text(*SUBTITLE_POSITION, r'$\widetilde G=1$    |    $M=3m$    |    $V_0/v=1.5$    |    $\gamma=0.1$    |    Impurity frame',
+    fig.text(*SUBTITLE_POSITION, r'$\widetilde G=1$    |    $M=3m$    |    $\gamma=0.1$    |    Impurity frame',
              fontsize=SUBTITLE_SIZE, color='0.4')
     transition_fractions = np.linspace(0, 1, TRANSITION_FRAMES + 2)[1:-1]
     transition_weights = (EASING_QUADRATIC*transition_fractions**2
@@ -172,9 +194,10 @@ def main():
     with tempfile.TemporaryDirectory(prefix='gpe-animation-') as directory:
         frames = Path(directory)
         for index, time in enumerate(frame_times):
-            mask = velocity[:, 0] <= time + GRID_TOLERANCE
-            history.set_data(velocity[mask, 0], velocity[mask, 1])
-            marker.set_data([time], [np.interp(time, velocity[:, 0], velocity[:, 1])])
+            for values, history, marker in zip(velocities, histories, markers):
+                mask = values[:, 0] <= time + GRID_TOLERANCE
+                history.set_data(values[mask, 0], values[mask, 1])
+                marker.set_data([time], [np.interp(time, values[:, 0], values[:, 1])])
             cursor.set_xdata([time, time])
             if index < INTRO_FRAMES:
                 density = np.full_like(positions, REFERENCE_DENSITY)
@@ -208,7 +231,7 @@ def main():
         video = OUTPUT/'velocity_density_animation.mp4'
         pipeline = ['gst-launch-1.0', '-e', 'multifilesrc', f'location={frames}/frame_%03d.png',
                     'index=0', f'stop-index={len(frame_times)-1}',
-                    f'caps=image/png,framerate=(fraction){FPS}/1', '!', 'pngdec', '!',
+                    f'caps=image/png,framerate=(fraction){FPS_NUMERATOR}/{FPS_DENOMINATOR}', '!', 'pngdec', '!',
                     'videoconvert', '!', 'video/x-raw,format=I420', '!', 'x264enc',
                     'pass=qual', f'quantizer={MP4_QUANTIZER}', 'speed-preset=medium', '!',
                     'video/x-h264,profile=high', '!', 'mp4mux', 'faststart=true', '!',
@@ -218,15 +241,19 @@ def main():
         (OUTPUT/'animation_encoding.log').write_text(result.stdout+result.stderr)
         if result.returncode:
             raise RuntimeError('MP4 encoding failed; see animation_encoding.log')
+        gif_boundaries = np.rint(np.arange(len(frame_times)+1)*1000/FPS/GIF_TIME_QUANTUM_MS)
+        gif_durations = (np.diff(gif_boundaries)*GIF_TIME_QUANTUM_MS).astype(int).tolist()
         gif_frames[0].save(OUTPUT/'velocity_density_animation.gif', save_all=True,
-                           append_images=gif_frames[1:], duration=FRAME_DURATION_MS,
+                           append_images=gif_frames[1:], duration=gif_durations,
                            loop=0, optimize=False)
     manifest = {'configuration_archive': metadata['archive'], 'configuration_count': len(files), 'files': files,
                 'times': times.tolist(), 'frame_times': frame_times.tolist(),
                 'intro_frames': INTRO_FRAMES, 'transition_frames': TRANSITION_FRAMES,
                 'transition_description': 'Smoothstep blend from uniform bath to first saved density; illustrative interpolation',
                 'boson_diameter_points': BOSON_DIAMETER, 'impurity_diameter_points': IMPURITY_DIAMETER, 'intro_description': 'Illustrated t=0 uniform bath; not a saved configuration',
-                'fps': FPS, 'duration_seconds': len(frame_times)/FPS,
+                'fps': FPS, 'playback_speed_relative_to_first_version': PLAYBACK_SPEED,
+                'velocity_initials': list(VELOCITY_INITIALS), 'density_initial_velocity': 1.5,
+                'all_velocity_sources': json.loads((OUTPUT/'velocity_sources.json').read_text()), 'duration_seconds': len(frame_times)/FPS,
                 'impurity_to_boson_diameter_ratio': IMPURITY_SIZE_RATIO,
                 'boson_display_stride': BOSON_DISPLAY_STRIDE,
                 'density_window': [-WINDOW, WINDOW],
