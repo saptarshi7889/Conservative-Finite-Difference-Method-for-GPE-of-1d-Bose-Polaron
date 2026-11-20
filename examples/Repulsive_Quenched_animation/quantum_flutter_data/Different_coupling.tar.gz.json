@@ -1,0 +1,41 @@
+[
+  {
+    "archive": "Different_coupling.tar.gz",
+    "member": "Different_coupling/G0.65/Phi_solution_herm_G0.65m0.125V3.5time25dt0.01dx1.66667e-05L1600_faster_finite_difference.dat",
+    "kind": "density",
+    "coupling": 0.65,
+    "mass_parameter": 0.125,
+    "initial_velocity": 3.5,
+    "dx": 1.66667e-05,
+    "dt": 0.01,
+    "length": 1600.0,
+    "cache": "843bc66d53a9cd7e.npz",
+    "time": 25.0
+  },
+  {
+    "archive": "Different_coupling.tar.gz",
+    "member": "Different_coupling/G0.5/m0.125/dx40000/impurity_velocity_herm_G0.5m0.125V3.5dx2.5e-05dt0.01L2400_upwind_faster_finite_difference_contd_rep4_corrected.dat",
+    "kind": "velocity",
+    "coupling": 0.5,
+    "mass_parameter": 0.125,
+    "initial_velocity": 3.5,
+    "dx": 2.5e-05,
+    "dt": 0.01,
+    "length": 2400.0,
+    "cache": "4c40d1b3a0b2c4d1.npz",
+    "time_range": []
+  },
+  {
+    "archive": "Different_coupling.tar.gz",
+    "member": "Different_coupling/G0.85/impurity_velocity_herm_G0.85m0.125V3.5dx1.66667e-05dt0.01L1600_upwind_faster_finite_difference_contd_rep2_corrected.dat",
+    "kind": "velocity",
+    "coupling": 0.85,
+    "mass_parameter": 0.125,
+    "initial_velocity": 3.5,
+    "dx": 1.66667e-05,
+    "dt": 0.01,
+    "length": 1600.0,
+    "cache": "5dcd257e7f56c14b.npz",
+    "time_range": []
+  }
+]

@@ -76,8 +76,47 @@
   "boson_diameter_points": 3.2,
   "impurity_diameter_points": 9.0,
   "intro_description": "Illustrated t=0 uniform bath; not a saved configuration",
-  "fps": 5,
-  "duration_seconds": 6.2,
+  "fps": 7.5,
+  "playback_speed_relative_to_first_version": 1.5,
+  "velocity_initials": [
+    0.5,
+    1.0,
+    1.5,
+    2.5,
+    3.5,
+    4.0
+  ],
+  "density_initial_velocity": 1.5,
+  "all_velocity_sources": {
+    "0.5": [
+      "Velocity_initial_vel_final/Actual/V0.5/dx900/dt0.0025_L1600/impurity_velocity_herm_G1m0.333333V0.5dx0.00111111dt0.0025L1600_faster_finite_difference.dat",
+      "Velocity_initial_vel_final/Actual/V0.5/dx900/dt0.0025_L1600/impurity_velocity_herm_G1m0.333333V0.5dx0.00111111dt0.0025L1600_upwind_faster_finite_difference_contd_rep1_corrected.dat"
+    ],
+    "1.0": [
+      "Velocity_initial_vel_final/Actual/V1_dx2500/impurity_velocity_herm_G1m0.333333V1dx0.0004dt0.01L1000_faster_finite_difference.dat"
+    ],
+    "1.5": [
+      "plot_data.npz (previously verified source)"
+    ],
+    "2.5": [
+      "Velocity_initial_vel_final/Actual/V2.5_dx30000.tar.gz::V2.5_dx30000/impurity_velocity_herm_G1m0.333333V2.5dx3.33333e-05dt0.01L1200_faster_finite_difference.dat"
+    ],
+    "3.5": [
+      "Velocity_initial_vel_final/Actual/V3.5_dx25000.tar.gz::V3.5_dx25000/impurity_velocity_herm_G1m0.333333V3.5dx4e-05dt0.01L1200_faster_finite_difference.dat"
+    ],
+    "4.0": [
+      "Velocity_initial_vel_final/Actual/V4_dx25000.tar.gz::V4_dx25000/impurity_velocity_herm_G1m0.333333V4dx4e-05dt0.01L1200_faster_finite_difference.dat"
+    ],
+    "6.0": [
+      "Velocity_initial_vel_final/Actual/V6_dx60000.tar.gz::V6_dx60000/impurity_velocity_herm_G1m0.333333V6dx1.66667e-05dt0.01L1100_faster_finite_difference.dat",
+      "Velocity_initial_vel_final/Actual/V6_dx60000.tar.gz::V6_dx60000/impurity_velocity_herm_G1m0.333333V6dx1.66667e-05dt0.01L1100_upwind_faster_finite_difference_contd_rep1_corrected.dat"
+    ],
+    "6.5": [
+      "Velocity_initial_vel_final/Actual/V6.5_dx60000.tar.gz::V6.5_dx60000/impurity_velocity_herm_G1m0.333333V6.5dx1.66667e-05dt0.01L1100_faster_finite_difference.dat",
+      "Velocity_initial_vel_final/Actual/V6.5_dx60000.tar.gz::V6.5_dx60000/impurity_velocity_herm_G1m0.333333V6.5dx1.66667e-05dt0.01L1100_upwind_faster_finite_difference_contd_rep1_corrected.dat"
+    ]
+  },
+  "duration_seconds": 4.133333333333334,
   "impurity_to_boson_diameter_ratio": 2.8125,
   "boson_display_stride": 10,
   "density_window": [

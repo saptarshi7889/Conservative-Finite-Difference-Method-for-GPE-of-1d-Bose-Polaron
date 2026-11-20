@@ -1,6 +1,6 @@
 # Repulsive quenched animation
 
-Fig. 8 (left) velocity animation for V0/v=0.5, 1, 1.5, 2.5, 3.5, 4, 6 and 6.5,
+Fig. 8 (left) velocity animation for V0/v=0.5, 1, 1.5, 2.5, 3.5 and 4,
 with G tilde=1, M=3m and gamma=0.1, through t=40. The density inset is
 explicitly labelled as corresponding only to V0/v=1.5.
 Paper: https://arxiv.org/abs/2507.10402.
@@ -35,5 +35,5 @@ Playback is 1.5 times faster than the first version: 31 frames at 7.5 fps
 (about 4.13 seconds). GIF durations alternate to approximate that rate within
 the format's 10 ms timing precision. Velocity histories are cached separately
 in `all_velocities.npz`, with source archive members recorded in
-`velocity_sources.json`. The two high-velocity curves from the paper's
-original inset are included in the main panel.
+`velocity_sources.json`. The V0/v=6 and 6.5 curves are omitted;
+the velocity y-axis extends to 4.5.
