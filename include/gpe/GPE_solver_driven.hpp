@@ -19,11 +19,11 @@ struct DrivenSimulationParameters {
     Eigen::VectorXcd initial_field; // Empty means phi(x) = 1.
     double t_initial = 0.0;
     std::optional<std::complex<double>> initial_velocity;
-    bool accept_unconverged_steps = false; // Accept the last finite iterate at the cap.
     bool write_plain_snapshots = false; // CLI checkpoint compatibility.
 };
 // Constant-force evolution with drive velocity (m/M)*F*t at absolute time t.
 // The initial field defaults to uniform and the fresh-run velocity to zero.
+// Throws on Picard nonconvergence before accepting or recording the failed step.
 // Output, convergence and in-memory restart conventions match GPE_solver.
 SimulationResult GPE_solver_driven(const DrivenSimulationParameters& parameters);
 }

@@ -37,6 +37,15 @@ if(BUILD_TESTING)
     set_target_properties(test_numerics PROPERTIES CXX_EXTENSIONS OFF)
     add_test(NAME numerics COMMAND test_numerics)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        add_test(NAME legacy_picard COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/legacy_picard.py ${CMAKE_CXX_COMPILER}
+            "$<TARGET_PROPERTY:Eigen3::Eigen,INTERFACE_INCLUDE_DIRECTORIES>")
+    endif()
+    add_executable(test_picard tests/picard.cpp)
+    target_link_libraries(test_picard PRIVATE gpe::solver)
+    add_test(NAME picard COMMAND ${Python3_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/picard.py $<TARGET_FILE:test_picard>)
     add_executable(test_driven tests/driven.cpp)
     target_link_libraries(test_driven PRIVATE gpe::solver)
     add_test(NAME driven COMMAND ${Python3_EXECUTABLE}

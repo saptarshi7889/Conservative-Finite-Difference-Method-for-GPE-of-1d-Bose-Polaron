@@ -23,7 +23,6 @@ struct SimulationParameters {
     double t_initial = 0.0;
     std::optional<std::complex<double>> initial_velocity;
     double force = 0.0; // Dimensionless F: drive velocity = V_0 + (m/M)*F*t.
-    bool accept_unconverged_steps = false; // Accept the last finite iterate at the cap.
     bool write_plain_snapshots = false; // CLI checkpoint compatibility.
 };
 struct SimulationResult {
@@ -34,6 +33,7 @@ struct SimulationResult {
     double final_time;
 };
 // Writes and flushes each velocity record directly to disk; retains no velocity history.
-// Throws std::exception on invalid input, nonconvergence (unless explicitly accepted), or output failure.
+// Throws std::exception on invalid input, nonconvergence, or output failure.
+// A failed Picard step is never accepted or written as a completed state.
 SimulationResult GPE_solver(const SimulationParameters& parameters);
 }

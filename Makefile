@@ -20,7 +20,12 @@ build/test_continuation: tests/continuation.cpp src/solver.cpp src/continuation.
 build/test_driven: tests/driven.cpp src/solver.cpp src/continuation.cpp src/driven.cpp src/numerics.hpp src/snapshot_archive.hpp include/gpe/solver.hpp include/gpe/GPE_solver_contd.hpp include/gpe/GPE_solver_driven.hpp include/gpe/GPE_solver_driven_contd.hpp
 	mkdir -p build
 	$(CXX) $(CPPFLAGS) -I"$(EIGEN_INCLUDE)" -Iinclude $(CXXFLAGS) tests/driven.cpp src/solver.cpp src/continuation.cpp src/driven.cpp $(LDFLAGS) -lz -larchive -o $@
-test: build/gpe build/test_numerics build/test_library build/test_continuation build/test_driven
+build/test_picard: tests/picard.cpp src/solver.cpp src/continuation.cpp src/driven.cpp src/numerics.hpp src/snapshot_archive.hpp include/gpe/solver.hpp include/gpe/GPE_solver_contd.hpp include/gpe/GPE_solver_driven.hpp include/gpe/GPE_solver_driven_contd.hpp
+	mkdir -p build
+	$(CXX) $(CPPFLAGS) -I"$(EIGEN_INCLUDE)" -Iinclude $(CXXFLAGS) tests/picard.cpp src/solver.cpp src/continuation.cpp src/driven.cpp $(LDFLAGS) -lz -larchive -o $@
+test: build/gpe build/test_numerics build/test_library build/test_continuation build/test_driven build/test_picard
+	python3 tests/legacy_picard.py "$(CXX)" "$(EIGEN_INCLUDE)"
+	python3 tests/picard.py ./build/test_picard
 	python3 tests/driven.py ./build/test_driven
 	./build/test_numerics
 	python3 tests/library.py ./build/test_library ./build/gpe

@@ -3,6 +3,7 @@
 C++17 library for the coupled Gross–Pitaevskii equation and impurity velocity,
 with periodic boundaries, finite differences, and Picard iteration.
 Use it for a fresh simulation or to continue from a compressed checkpoint.
+All four solver interfaces stop on Picard nonconvergence; failed steps are not accepted.
 
 
 - [Constant momentum (Quenched) impurity](#1-constant-momentum-quenched-impurity)

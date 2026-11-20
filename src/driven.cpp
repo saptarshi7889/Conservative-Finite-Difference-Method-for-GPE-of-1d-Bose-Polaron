@@ -21,7 +21,6 @@ gpe::SimulationParameters settings_for(const gpe::DrivenSimulationParameters& pa
     settings.initial_field = parameters.initial_field;
     settings.t_initial = parameters.t_initial;
     settings.initial_velocity = parameters.initial_velocity;
-    settings.accept_unconverged_steps = parameters.accept_unconverged_steps;
     settings.write_plain_snapshots = parameters.write_plain_snapshots;
     return settings;
 }
