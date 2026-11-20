@@ -1,0 +1,18 @@
+name: bose-polaron-gpe-python
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python >=3.10,<3.14
+  - numpy >=1.23
+  - pybind11 >=2.13
+  - scikit-build-core >=1.0
+  - python-build
+  - pip
+  - cxx-compiler
+  - eigen >=3.3,<4
+  - cmake >=3.17,<4
+  - ninja
+  - zlib >=1.2,<2
+  - libarchive >=3.6,<4
+  - make

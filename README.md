@@ -1,17 +1,76 @@
 # GPE solver for a 1D Bose polaron
 
-C++17 library for the coupled Gross–Pitaevskii equation and impurity velocity,
+C++17 library with a Python interface for the coupled Gross–Pitaevskii equation
+and impurity velocity,
 with periodic boundaries, finite differences, and Picard iteration.
 Use it for a fresh simulation or to continue from a compressed checkpoint.
 All four solver interfaces stop on Picard nonconvergence; failed steps are not accepted.
 
 
+- [Python installation](#python-installation-from-this-checkout)
 - [Constant momentum (Quenched) impurity](#1-constant-momentum-quenched-impurity)
 - [Constant force (Driven) impurity](#2-constant-force-driven-impurity)
 
+## Python installation from this checkout
+
+Python users call the same compiled C++ solver using `bose_polaron_gpe`.
+NumPy arrays represent fields; all evolution and checkpoint I/O remain in C++.
+**Use a checkout containing `pyproject.toml` and `environment-python.yml`: the
+Python interface is not in the v0.2.0 archives below and is not yet on PyPI.**
+
+From this repository's root, create a dedicated environment and install:
+
+```sh
+conda env create -f environment-python.yml
+conda activate bose-polaron-gpe-python
+python -m pip install --no-build-isolation --no-deps .
+python -c "import bose_polaron_gpe as gpe; print(gpe.__version__)"
+```
+
+The environment supplies Python, NumPy, pybind11, scikit-build-core, the C++
+compiler and native dependencies. Environment creation downloads packages;
+installation compiles the extension using those existing dependencies.
+`--no-build-isolation --no-deps` avoids downloading another set of dependencies.
+Python users do not need to run the separate CMake commands below.
+For Jupyter, select a kernel using this environment's Python.
+
+| Python parameters | Fresh run / field in memory | Compressed continuation |
+| --- | --- | --- |
+| `gpe.SimulationParameters` (`V_0`) | `gpe.GPE_solver` | `gpe.GPE_solver_contd` |
+| `gpe.DrivenSimulationParameters` (`F`) | `gpe.GPE_solver_driven` | `gpe.GPE_solver_driven_contd` |
+
+Runnable Python snippets appear in each physical case below. To run the complete
+example and Python tests in the activated environment:
+
+```sh
+python examples/python/simulation.py
+python tests/python_api.py
+```
+
+The example creates `python-example-results/`, which must not already exist;
+the tests use temporary directories. Every simulation requires a new output
+directory with an existing parent. The small examples verify functionality;
+they are not converged research simulations.
+
+Results expose `final_time`, `final_velocity`, `final_field`, `velocity_file`,
+and `configurations_archive`. `final_field` is a read-only NumPy `complex128`
+array; use `.copy()` for a writable independent array. Assigning an initial
+NumPy field to `parameters.initial_field` copies it; assign `None` to clear it.
+Output paths accept strings or `pathlib.Path` and returned paths are
+`pathlib.Path` objects. Velocity/configuration histories stream to disk.
+
+Invalid settings, checkpoint errors and Picard nonconvergence raise Python
+exceptions (`RuntimeError` for solver failures). A failed step is not accepted
+or saved. Catch `RuntimeError` in your Python program to handle that stop.
+
+See the [full Python guide](docs/PYTHON.md) for ownership, threads, source-build
+requirements and wheel limitations, and the
+[complete example](examples/python/simulation.py) for all four calls.
+
 ## Shared setup
 
-The build and installation steps apply to both cases below. The v0.2.0 release
+The following download and build commands are for C++ users in both cases.
+Python users should follow the installation above. The v0.2.0 release
 supports the quenched case; use current repository source for the driven case.
 
 ### Download
@@ -61,6 +120,47 @@ With no external force, the total momentum is fixed by the initial quench.
 Set the injection velocity through `SimulationParameters::V_0` and leave
 `force = 0` (the default). The impurity velocity evolves through its coupling
 to the Bose gas.
+
+### Run from Python
+
+After installing the Python package above, run this in Python or a notebook:
+
+```python
+import numpy as np
+import bose_polaron_gpe as gpe
+
+parameters = gpe.SimulationParameters()
+parameters.V_0 = 0.5
+parameters.G = -1.5
+parameters.length = 16.0
+parameters.dx = 0.125
+parameters.dt = 0.001
+parameters.t_final = 0.02
+parameters.output_directory = "quenched-python-results"
+result = gpe.GPE_solver(parameters)
+
+density = np.abs(result.final_field) ** 2
+print(result.final_time, result.final_velocity)
+print(result.velocity_file, result.configurations_archive)
+```
+
+Continue that run from its compressed t=0.02 checkpoint in the same Python
+session, keeping the original `V_0` and physical/grid parameters:
+
+```python
+parameters.t_initial = result.final_time
+parameters.t_final = 0.04
+parameters.initial_velocity = result.final_velocity
+parameters.initial_field = None
+parameters.output_directory = "quenched-python-continued"
+continued = gpe.GPE_solver_contd(
+    parameters, result.configurations_archive, "phi_20.dat"
+)
+```
+
+For a field already in memory, assign `parameters.initial_field = result.final_field`
+and call `gpe.GPE_solver(parameters)` instead, with the checkpoint time and
+velocity set as above and a new output directory.
 
 ### Run your own C++ simulation
 
@@ -192,6 +292,50 @@ cover a fresh run and continuation directly from its compressed checkpoint.
 Keep F and all physical/grid settings when restarting;
 the force uses absolute simulation time, not time since restart.
 
+### Run from Python
+
+Use `DrivenSimulationParameters` with `F` replacing `V_0`:
+
+```python
+import numpy as np
+import bose_polaron_gpe as gpe
+
+parameters = gpe.DrivenSimulationParameters()
+parameters.F = 0.5
+parameters.G = 0.5
+parameters.mass_ratio = 1.0 / 3.0
+parameters.gamma = 1.0 / 400.0
+parameters.length = 16.0
+parameters.dx = 0.125
+parameters.dt = 0.001
+parameters.t_final = 0.02
+parameters.output_directory = "driven-python-results"
+result = gpe.GPE_solver_driven(parameters)
+
+density = np.abs(result.final_field) ** 2
+print(result.final_time, result.final_velocity)
+```
+
+Continue from that run's compressed checkpoint without resetting the force clock:
+
+```python
+parameters.t_initial = result.final_time
+parameters.t_final = 0.04
+parameters.initial_velocity = result.final_velocity
+parameters.initial_field = None
+parameters.output_directory = "driven-python-continued"
+continued = gpe.GPE_solver_driven_contd(
+    parameters, result.configurations_archive, "phi_20.dat"
+)
+```
+
+Retain F and the physical/grid settings. For continuation in memory, assign
+`parameters.initial_field = result.final_field` and call
+`gpe.GPE_solver_driven(parameters)` with the same checkpoint time and velocity,
+and a new output directory. In either physical case, `phi_20.dat` is specific
+to these examples; select the matching member for your own checkpoint. For a
+single `.dat.gz` or `.dat.xz` field, omit the member argument.
+
 ### Build and run the driven example
 
 After building the current source with the shared setup commands:
@@ -275,6 +419,8 @@ also writes plain `phi_STEP.dat` snapshots.
 
 | Location | Purpose |
 | --- | --- |
+| `python/` | Python package and pybind11 bindings to the C++ solver |
+| `examples/python/` | Python quenched/driven and compressed-continuation example |
 | `include/gpe/` | Public headers for your programs |
 | `src/` | Compiled solver implementation and command-line driver |
 | `examples/library/` | Quenched fresh-run and compressed-continuation example |

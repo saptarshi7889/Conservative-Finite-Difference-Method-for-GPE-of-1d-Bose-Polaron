@@ -11,3 +11,4 @@ __pycache__/
 /examples/L500_v05/animation_manifest.json
 /examples/L500_v05/summary.txt
 /examples/L500_v05/*_summary.txt
+/python-example-results/

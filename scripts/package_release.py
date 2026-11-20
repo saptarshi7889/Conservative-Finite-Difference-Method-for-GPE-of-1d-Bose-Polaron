@@ -14,6 +14,7 @@ ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 ZIP_COMPRESSION = 9
 FILE_MODE = 0o644
 PACKAGE_PATHS = (
+    'pyproject.toml', 'environment-python.yml', 'python', 'examples/python',
     'environment.yml', 'examples/library', 'examples/driven', 'examples/F4', 'examples/G05_F05_L8500',
     'examples/L500_v05/compare_library.py', 'examples/L500_v05/compare_continuation.py', 'examples/L500_v05/COMPARISON.md',
     'CMakeLists.txt', 'Makefile', 'LICENSE', 'CITATION.cff', 'README.md',

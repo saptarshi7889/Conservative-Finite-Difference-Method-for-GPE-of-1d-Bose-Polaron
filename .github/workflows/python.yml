@@ -1,0 +1,38 @@
+name: Python package
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ['3.10', '3.13']
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: environment-python.yml
+          activate-environment: bose-polaron-gpe-python
+          python-version: ${{ matrix.python }}
+          auto-activate-base: false
+      - name: Build and test the original C++ library
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure
+      - name: Build source distribution and wheel from that distribution
+        run: python -m build --no-isolation --outdir dist/python
+      - name: Install the local wheel without downloads
+        run: python -m pip install --no-deps --no-index dist/python/*.whl
+      - name: Test installed Python interfaces against C++
+        run: python tests/python_api.py --cli "$PWD/build/gpe" -v
+      - name: Run the Python example outside the checkout
+        run: |
+          cd "$RUNNER_TEMP"
+          python "$GITHUB_WORKSPACE/examples/python/simulation.py"
