@@ -6,6 +6,7 @@
 #include <limits>
 
 namespace {
+constexpr double TEST_FORCE = 0.5;
 constexpr double CHECKPOINT_TIME = 0.01;
 constexpr int SAVE_INTERVAL = 10;
 constexpr int OUTPUT_PRECISION = std::numeric_limits<double>::max_digits10;
@@ -16,6 +17,7 @@ int main(int argc, char** argv) {
     try {
         const std::filesystem::path root = argv[1];
         gpe::SimulationParameters p;
+        p.force = TEST_FORCE;
         p.V_0 = std::stod(argv[2]);
         p.config_save_every = SAVE_INTERVAL;
         p.velocity_save_every = SAVE_INTERVAL;

@@ -235,10 +235,11 @@ int main(int argc, char *argv[]) {
     
     //initialising the output files for data
     char filename_velocity[200], filename_solution[200],filename_norm[200],filename_driven_velocity[200], filename_convergence_check[200];
-    ofstream myfile_velocity, myfile_solution,myfile_norm myfile_convergence_check;
+    ofstream myfile_velocity, myfile_solution,myfile_norm, myfile_convergence_check, myfile_driven_velocity;
     int rep=7; //keeps track of the repetition number of the simulation with the same code.
     sprintf(filename_velocity,"impurity_velocity_herm_G%gm%gF%gdx%gdt%gL%d_finite_difference_contd_rep%d.dat",G_tilde,m_tilde,real(F),delta_x,delta_t,Length,rep);
     sprintf(filename_norm,"Norm_evolution_herm_G%gm%gF%gdx%gdt%gL%d_finite_difference_contd_rep%d.dat",G_tilde,m_tilde,real(F),delta_x,delta_t,Length,rep);
+    sprintf(filename_driven_velocity,"driven_velocity_herm_G%gm%gF%gdx%gdt%gL%d_contd_rep%d.dat",G_tilde,m_tilde,real(F),delta_x,delta_t,Length,rep);
     sprintf(filename_convergence_check,"Convergence_check_G%gm%gF%gdx%gdt%gL%d_finite_difference_contd_rep%d.dat",G_tilde,m_tilde,real(F),delta_x,delta_t,Length,rep);
     
     

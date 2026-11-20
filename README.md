@@ -84,16 +84,26 @@ Pass the library installation directory through `-DCMAKE_PREFIX_PATH` as above.
 
 ## Constant-force impurity
 
-The current source supports `--force F` (default zero) and
-`SimulationParameters::force`. It follows the supplied adiabatic research code:
-the velocity drive is `V_0 + (m/M)*F*t`, with the existing boson momentum
-contribution added. Set `--velocity 0` for a driven impurity initially at rest.
-The initial field defaults to uniform, including for nonzero coupling.
+A constant external force F drives the impurity through the Bose gas. The two
+original adiabatic research programs are retained at the repository root:
 
-See [the F=7 example](examples/F7/README.md) for the requested large-grid
-parameters, compressed output, and the observed Picard convergence failure.
-These additions are in the working source; the v0.2.0 release linked above
-does not include them.
+- [Fresh driven run](finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_massdep_Kamenev_new_cluster_upwind_scheme.cpp).
+- [Driven continuation](finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_contd_massdep_Kamenev_new_cluster_upwind_scheme.cpp).
+
+For reusable simulations, use the same library interfaces as above with
+`SimulationParameters::force`, or pass `--force F` to `gpe`. The drive term is
+`V_0 + (m/M)*F*t`, with the boson momentum contribution added to obtain the
+impurity velocity. Set `V_0 = 0` (CLI: `--velocity 0`) for an initially resting
+impurity. The default initial field is uniform.
+
+**Use the current repository source for constant-force support; v0.2.0 above
+predates it.** Download the [current source ZIP](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/archive/refs/heads/master.zip)
+or clone the repository, then follow the build commands above.
+
+[Runnable driven example and research-code instructions](examples/driven/README.md)
+cover a fresh run and continuation directly from its compressed checkpoint.
+Keep F, the original V_0, and all physical/grid settings when restarting;
+the force uses absolute simulation time, not time since restart.
 
 ## 4. Continue from a compressed checkpoint
 
@@ -182,6 +192,29 @@ Impurity velocity with a synchronized boson-density inset in the impurity frame.
 
 [Download the video](docs/media/velocity_density_animation.mp4)
 
+### Driven impurity: generalized case
+
+G = 0.5, F = 0.5, gamma = 1/400, M = 3m (L = 8500).
+
+![Driven impurity, G=0.5 and F=0.5](docs/media/G05_F05_L8500/velocity_density_animation.gif)
+
+[Watch/download MP4](docs/media/G05_F05_L8500/velocity_density_animation.mp4) ·
+[Animation provenance and rendering](examples/G05_F05_L8500/README.md)
+
+### Very strongly coupled impurity
+
+G = 15, F = 4, gamma = 1/400, M = 3m.
+
+![Strongly coupled driven impurity, G=15 and F=4](docs/media/F4/velocity_density_animation.gif)
+
+[Watch/download MP4](docs/media/F4/velocity_density_animation.mp4) ·
+[Animation provenance and rendering](examples/F4/README.md)
+
+Both animations show recorded velocity and density in the impurity frame.
+Their immersion openings and transitions to the first saved field are
+illustrative, as described in the example READMEs. These are supplied research
+runs; the small library example does not reproduce their full grids or duration.
+
 ## License and citation
 
 MIT license; see [LICENSE](LICENSE) and [CITATION.cff](CITATION.cff).
@@ -189,3 +222,8 @@ MIT license; see [LICENSE](LICENSE) and [CITATION.cff](CITATION.cff).
 Saptarshi Majumdar and Aleksandra Petković, “Relaxation dynamics of a mobile
 impurity injected into a one-dimensional Bose gas,” Physical Review A **112**,
 053326 (2025), [doi:10.1103/tgl5-rdn5](https://doi.org/10.1103/tgl5-rdn5).
+
+The constant-force dynamics are discussed in:
+
+- Saptarshi Majumdar and Aleksandra Petković, “Bloch oscillations of a mobile impurity in a one-dimensional Bose gas,” Physical Review A **113**, 043309 (2026), [doi:10.1103/bfcg-m2tw](https://journals.aps.org/pra/abstract/10.1103/bfcg-m2tw) (repulsive interaction).
+- Saptarshi Majumdar and Aleksandra Petković, “Driven dynamics of an attractive Bose polaron,” Physical Review A **114**, 053303 (2026), [doi:10.1103/t36j-gd59](https://journals.aps.org/pra/abstract/10.1103/t36j-gd59) (attractive interaction).

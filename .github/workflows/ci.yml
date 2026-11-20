@@ -29,6 +29,12 @@ jobs:
           cmake --build consumer-build --parallel 2
           cd consumer-build
           ./simulation
+      - name: Test installed driven example
+        run: |
+          cmake -S examples/driven -B driven-build -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/gpe-install" -DCMAKE_BUILD_TYPE=Release
+          cmake --build driven-build --parallel 2
+          cd driven-build
+          ./simulation
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -50,4 +56,10 @@ jobs:
           cmake -S examples/library -B consumer-build -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/gpe-install" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
           cmake --build consumer-build --parallel 2
           cd consumer-build
+          ./simulation
+      - name: Test installed driven example
+        run: |
+          cmake -S examples/driven -B driven-build -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/gpe-install" -DCMAKE_BUILD_TYPE=Release
+          cmake --build driven-build --parallel 2
+          cd driven-build
           ./simulation
