@@ -15,8 +15,6 @@ ZIP_COMPRESSION = 9
 FILE_MODE = 0o644
 PACKAGE_PATHS = (
     'environment.yml', 'examples/library', 'examples/driven', 'examples/F4', 'examples/G05_F05_L8500',
-    'finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_massdep_Kamenev_new_cluster_upwind_scheme.cpp',
-    'finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_contd_massdep_Kamenev_new_cluster_upwind_scheme.cpp',
     'examples/L500_v05/compare_library.py', 'examples/L500_v05/compare_continuation.py', 'examples/L500_v05/COMPARISON.md',
     'CMakeLists.txt', 'Makefile', 'LICENSE', 'CITATION.cff', 'README.md',
     'VALIDATION.md', 'PUBLISHING.md', 'RELEASE_NOTES.md', 'src', 'tests', 'include', 'cmake',

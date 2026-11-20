@@ -2,7 +2,11 @@
 
 The reusable C++17 library supports the drive in both original adiabatic
 research programs: the imposed momentum gives a velocity contribution
-V_0 + (m/M) F t, plus the coupled boson momentum contribution.
+(m/M) F t, plus the coupled boson momentum contribution.
+Include `<gpe/GPE_solver_driven.hpp>` for `gpe::GPE_solver_driven`, or
+`<gpe/GPE_solver_driven_contd.hpp>` for `gpe::GPE_solver_driven_contd`.
+Set `gpe::DrivenSimulationParameters`, with `F` replacing the previous `V_0`
+input; the initial drive velocity is fixed at zero. Link to `gpe::solver`.
 Positive G is repulsive; negative G is attractive. The mass parameter is m/M.
 
 ## Runnable library example
@@ -17,7 +21,7 @@ cmake --build build/driven --parallel 2
 cmake -E chdir build/driven ./simulation
 ```
 
-`main.cpp` sets F=0.5, G=0.5, gamma=1/400, M=3m and V_0=0.
+`main.cpp` sets F=0.5, G=0.5, gamma=1/400, M=3m and starts at rest.
 It uses the small library grid L=16, dx=0.125, dt=0.001: a functionality
 example, not a converged reproduction of the L=8500 animation.
 It evolves to t=0.02, then continues from compressed `phi_20.dat` to t=0.04.
@@ -38,8 +42,8 @@ The CLI also accepts the drive, for example:
 
 ## Restart requirements
 
-Keep the force and physical/grid parameters unchanged, retain the original
-V_0, set `t_initial` to the absolute checkpoint time, and supply its recorded
+Keep the force and physical/grid parameters unchanged, set `t_initial` to the
+absolute checkpoint time, and supply its recorded
 complex velocity. The example passes the final velocity directly from the
 fresh result and selects the corresponding compressed field. Do not reset
 the force clock to zero at restart. See the root continuation guide for files
@@ -47,14 +51,14 @@ from an earlier process.
 
 ## Original standalone research programs
 
-The two long-named `adiabatic` C++ files at the repository root are the original
+The two long-named `adiabatic` C++ files in `legacy/` are the original
 fresh and continuation implementations. They use Eigen and GNU C++ headers
 (including `bits/stdc++.h`), with simulation parameters embedded in `main`.
 With GCC and an existing Eigen installation, compile from the repository root:
 
 ```sh
-g++ -O2 -std=c++17 -I/path/to/eigen3 finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_massdep_Kamenev_new_cluster_upwind_scheme.cpp -o build/driven-original
-g++ -O2 -std=c++17 -I/path/to/eigen3 finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_contd_massdep_Kamenev_new_cluster_upwind_scheme.cpp -o build/driven-original-contd
+g++ -O2 -std=c++17 -I/path/to/eigen3 legacy/finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_massdep_Kamenev_new_cluster_upwind_scheme.cpp -o build/driven-original
+g++ -O2 -std=c++17 -I/path/to/eigen3 legacy/finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_contd_massdep_Kamenev_new_cluster_upwind_scheme.cpp -o build/driven-original-contd
 ```
 
 Create `build/` first if it does not exist. Before running, edit `m_tilde`,

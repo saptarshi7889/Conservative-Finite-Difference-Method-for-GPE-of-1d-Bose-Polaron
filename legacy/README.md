@@ -1,7 +1,7 @@
 # Original research programs
 
-These two C++ programs are preserved byte-for-byte from their original location
-in the repository root. They provide the historical fresh-run and continuation
+The two undriven C++ programs are preserved byte-for-byte from their original
+location in the repository root. They provide the historical fresh-run and continuation
 implementations used for numerical comparisons.
 
 For new simulations, include `<gpe/solver.hpp>`, set
@@ -13,3 +13,11 @@ is built from `src/`.
 The historical programs contain their own parameter settings, output handling,
 and stopping conditions. They are retained as reference sources and are not
 built by the standard Make or CMake targets.
+
+The two `adiabatic` programs provide the original constant-force fresh run and
+continuation. They were moved from the repository root after the continuation
+stream-declaration/filename fixes; this move does not alter their contents.
+For driven simulations, use `<gpe/GPE_solver_driven.hpp>` and
+`<gpe/GPE_solver_driven_contd.hpp>` with `gpe::DrivenSimulationParameters`:
+F replaces V_0, and the imposed drive is (m/M) F t. See the
+[driven example and standalone instructions](../examples/driven/README.md).

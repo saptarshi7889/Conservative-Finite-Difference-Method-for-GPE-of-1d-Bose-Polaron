@@ -295,3 +295,34 @@ The grid is `x_i = i*dx - length/2`. The supplied delta-potential routine places
 its nonzero element at index `N/2-1`, which is `x=-dx` for an even grid. This
 one-cell offset is retained for regression compatibility.
 
+
+## Constant-force library headers
+
+Include `<gpe/GPE_solver_driven.hpp>` for a fresh run or a field in memory;
+include `<gpe/GPE_solver_driven_contd.hpp>` for compressed continuation.
+Both link to the installed `gpe::solver` target.
+
+```cpp
+#include <gpe/GPE_solver_driven_contd.hpp>
+
+// Inside your simulation program:
+gpe::DrivenSimulationParameters parameters;
+parameters.F = 0.5; // Dimensionless force, replacing the V_0 input.
+parameters.output_directory = "driven-results";
+auto result = gpe::GPE_solver_driven(parameters);
+```
+
+The remaining settings have the same names, defaults and meaning as in
+`SimulationParameters`. There is no V_0 or separate `force` setting in this
+driven interface: the initial drive velocity is zero and the drive contribution
+is `(m/M)*F*t`. The default F is 0.5. The initial field defaults to uniform.
+For in-memory continuation, set `initial_field`, `initial_velocity` and
+`t_initial` as before, then call `GPE_solver_driven`.
+
+For file continuation, leave `initial_field` empty, supply the absolute
+`t_initial` and recorded `initial_velocity`, and call
+`GPE_solver_driven_contd(parameters, checkpoint_file, checkpoint_member)`.
+Retain F and the physical/grid settings. Compression formats, archive member
+selection, output cadence and convergence checks match the undriven API.
+The [complete driven example](../examples/driven/main.cpp) performs both calls.
+The original standalone adiabatic programs now reside in `legacy/`.

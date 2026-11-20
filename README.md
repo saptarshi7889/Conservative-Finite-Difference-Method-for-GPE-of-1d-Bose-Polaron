@@ -85,16 +85,24 @@ Pass the library installation directory through `-DCMAKE_PREFIX_PATH` as above.
 ## Constant-force impurity
 
 A constant external force F drives the impurity through the Bose gas. The two
-original adiabatic research programs are retained at the repository root:
+original adiabatic research programs are retained in `legacy/`:
 
-- [Fresh driven run](finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_massdep_Kamenev_new_cluster_upwind_scheme.cpp).
-- [Driven continuation](finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_contd_massdep_Kamenev_new_cluster_upwind_scheme.cpp).
+- [Fresh driven run](legacy/finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_massdep_Kamenev_new_cluster_upwind_scheme.cpp).
+- [Driven continuation](legacy/finite_difference_modified_impurity_Thomas_generalized_adiabatic_without_Matrix_hermitian_vel_contd_massdep_Kamenev_new_cluster_upwind_scheme.cpp).
 
-For reusable simulations, use the same library interfaces as above with
-`SimulationParameters::force`, or pass `--force F` to `gpe`. The drive term is
-`V_0 + (m/M)*F*t`, with the boson momentum contribution added to obtain the
-impurity velocity. Set `V_0 = 0` (CLI: `--velocity 0`) for an initially resting
-impurity. The default initial field is uniform.
+For reusable driven simulations, use the headers below with
+`DrivenSimulationParameters::F`. The CLI accepts `--force F --velocity 0`.
+The driven interfaces fix V₀ = 0 and use drive velocity `(m/M)*F*t`,
+with the boson momentum contribution added to obtain the impurity velocity.
+
+| Task | Header | Function |
+| --- | --- | --- |
+| Fresh driven run / field in memory | `gpe/GPE_solver_driven.hpp` | `gpe::GPE_solver_driven` |
+| Driven compressed continuation | `gpe/GPE_solver_driven_contd.hpp` | `gpe::GPE_solver_driven_contd` |
+
+Set `gpe::DrivenSimulationParameters`: the simulation settings match
+`SimulationParameters`, with `F` replacing `V_0` and no separate `force` field.
+Link to the same `gpe::solver` compiled library. The default initial field is uniform.
 
 **Use the current repository source for constant-force support; v0.2.0 above
 predates it.** Download the [current source ZIP](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/archive/refs/heads/master.zip)
@@ -102,7 +110,7 @@ or clone the repository, then follow the build commands above.
 
 [Runnable driven example and research-code instructions](examples/driven/README.md)
 cover a fresh run and continuation directly from its compressed checkpoint.
-Keep F, the original V_0, and all physical/grid settings when restarting;
+Keep F and all physical/grid settings when restarting;
 the force uses absolute simulation time, not time since restart.
 
 ## 4. Continue from a compressed checkpoint
