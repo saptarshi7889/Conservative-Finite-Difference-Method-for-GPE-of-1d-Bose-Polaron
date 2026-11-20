@@ -1,0 +1,32 @@
+{
+  "archive": "/run/media/sap/RIdata/Data/Repulsive_impurity_simulation_data/Repulsive_Quenched/Velocity_initial_vel_final.tar.gz",
+  "snapshot_members": [
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time2.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time7.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time10dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time12.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time15dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time17.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time20dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time22.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time25dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time27.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time30dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time32.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time35dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time37.5dt0.01dx0.000333333L1000_faster_finite_difference.dat",
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/Phi_solution_herm_G1m0.333333V1.5time40dt0.01dx0.000333333L1000_faster_finite_difference.dat"
+  ],
+  "velocity_members": [
+    "Velocity_initial_vel_final/Actual/V1.5/dx3000/impurity_velocity_herm_G1m0.333333V1.5dx0.000333333dt0.01L1000_faster_finite_difference.dat"
+  ],
+  "dx": 0.0003333333333333333,
+  "dt": 0.01,
+  "length": 1000,
+  "window": [
+    -40,
+    40
+  ],
+  "stride": 150
+}
