@@ -29,7 +29,8 @@ FPS = BASE_FPS * PLAYBACK_SPEED
 FPS_NUMERATOR = 15
 FPS_DENOMINATOR = 2
 GIF_TIME_QUANTUM_MS = 10
-VELOCITY_INITIALS = (0.5, 1.0, 1.5, 2.5, 3.5, 4.0, 6.0, 6.5)
+VELOCITY_INITIALS = (0.5, 1.0, 1.5, 2.5, 3.5, 4.0)
+VELOCITY_AXIS_MAX = 4.5
 VELOCITY_COLORS = ("#e32929", "#c69200", "#2455cf", "#303030", "#7025a8", "#258130", "#29b9e8", "#ef2190")
 LEGEND_COLUMNS = 4
 LEGEND_FONT_SIZE = 9
@@ -135,7 +136,7 @@ def main():
                         bottom=SUBPLOT_MARGINS[2], top=SUBPLOT_MARGINS[3])
     ax.set(xlim=(velocity[0, 0], times[-1]),
            ylim=(min(values[:, 1].min() for values in velocities)-VELOCITY_PADDING,
-                 max(values[:, 1].max() for values in velocities)+VELOCITY_PADDING),
+                 VELOCITY_AXIS_MAX),
            xlabel=r'$tgn_0/\hbar$', ylabel=r'Impurity velocity $V/v$')
     ax.grid(alpha=GRID_ALPHA)
     ax.spines[['top', 'right']].set_visible(False)

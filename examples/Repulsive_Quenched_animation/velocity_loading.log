@@ -1,2 +1,7 @@
 Reading nested archive V6_dx60000.tar.gz
 V0=6: Velocity_initial_vel_final/Actual/V6_dx60000.tar.gz::V6_dx60000/impurity_velocity_herm_G1m0.333333V6dx1.66667e-05dt0.01L1100_upwind_faster_finite_difference_contd_rep1_corrected.dat, t=32.5..66.9
+V0=6: Velocity_initial_vel_final/Actual/V6_dx60000.tar.gz::V6_dx60000/impurity_velocity_herm_G1m0.333333V6dx1.66667e-05dt0.01L1100_faster_finite_difference.dat, t=0..34.6
+Reading nested archive V3.5_dx25000.tar.gz
+V0=3.5: Velocity_initial_vel_final/Actual/V3.5_dx25000.tar.gz::V3.5_dx25000/impurity_velocity_herm_G1m0.333333V3.5dx4e-05dt0.01L1200_faster_finite_difference.dat, t=0..65.3
+Reading nested archive V6.5_dx60000.tar.gz
+V0=6.5: Velocity_initial_vel_final/Actual/V6.5_dx60000.tar.gz::V6.5_dx60000/impurity_velocity_herm_G1m0.333333V6.5dx1.66667e-05dt0.01L1100_faster_finite_difference.dat, t=0..33.9

@@ -1,0 +1,4 @@
+Reading Different_coupling.tar.gz
+Cached density: Different_coupling/G0.65/Phi_solution_herm_G0.65m0.125V3.5time25dt0.01dx1.66667e-05L1600_faster_finite_difference.dat
+Cached velocity: Different_coupling/G0.5/m0.125/dx40000/impurity_velocity_herm_G0.5m0.125V3.5dx2.5e-05dt0.01L2400_upwind_faster_finite_difference_contd_rep4_corrected.dat
+Cached velocity: Different_coupling/G0.85/impurity_velocity_herm_G0.85m0.125V3.5dx1.66667e-05dt0.01L1600_upwind_faster_finite_difference_contd_rep2_corrected.dat
