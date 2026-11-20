@@ -11,16 +11,16 @@ All four solver interfaces stop on Picard nonconvergence; failed steps are not a
 
 ## Shared setup
 
-The build and installation steps apply to both cases below. The v0.2.0 release
-supports the quenched case; use current repository source for the driven case.
+The build and installation steps apply to both cases below. Release v0.3.1
+includes both quenched and driven impurity solvers.
 
 ### Download
 
-Download **one complete source archive** from release **v0.2.0**:
+Download **one complete source archive** from release **v0.3.1**:
 
-- **[Download .tar.gz (Linux/macOS)](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.2.0/bose-polaron-gpe-0.2.0.tar.gz)**
-- **[Download .zip](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.2.0/bose-polaron-gpe-0.2.0.zip)**
-- [Release notes and checksums](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/tag/v0.2.0)
+- **[Download .tar.gz (Linux/macOS)](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.3.1/bose-polaron-gpe-0.3.1.tar.gz)**
+- **[Download .zip](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.3.1/bose-polaron-gpe-0.3.1.zip)**
+- [Release notes and checksums](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/tag/v0.3.1)
 
 Both archives contain the same source code. Download the complete archive:
 these headers belong to a **compiled library** and require the implementation
@@ -35,8 +35,8 @@ these dependencies separate from your base environment.
 For the `.tar.gz` download:
 
 ```sh
-tar -xzf bose-polaron-gpe-0.2.0.tar.gz
-cd bose-polaron-gpe-0.2.0
+tar -xzf bose-polaron-gpe-0.3.1.tar.gz
+cd bose-polaron-gpe-0.3.1
 conda env create -f environment.yml
 conda activate bose-polaron-gpe
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -45,7 +45,7 @@ ctest --test-dir build --output-on-failure
 ./build/gpe --output results
 ```
 
-For `.zip`, extract it and enter `bose-polaron-gpe-0.2.0`, then follow the same
+For `.zip`, extract it and enter `bose-polaron-gpe-0.3.1`, then follow the same
 commands starting at `conda env create`. If you already have the dependencies,
 start at `cmake -S .`. Environment creation downloads packages; build commands
 use existing dependencies.
@@ -183,9 +183,8 @@ Set `gpe::DrivenSimulationParameters`: the simulation settings match
 `SimulationParameters`, with `F` replacing `V_0` and no separate `force` field.
 Link to the same `gpe::solver` compiled library. The default initial field is uniform.
 
-**Use the current repository source for constant-force support; v0.2.0 above
-predates it.** Download the [current source ZIP](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/archive/refs/heads/master.zip)
-or clone the repository, then follow the build commands above.
+The v0.3.1 source archives above include both driven headers, their compiled
+implementation, and the runnable example.
 
 [Runnable driven example and research-code instructions](examples/driven/README.md)
 cover a fresh run and continuation directly from its compressed checkpoint.

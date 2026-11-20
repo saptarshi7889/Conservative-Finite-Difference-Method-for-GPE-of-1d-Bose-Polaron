@@ -1,3 +1,57 @@
+# v0.3.1 — New driven-impurity codes and strict Picard convergence
+
+This release adds codes for a **constant-force (driven) impurity**, alongside
+those for a constant-momentum (quenched) impurity.
+
+## New driven-impurity library interfaces
+
+- `<gpe/GPE_solver_driven.hpp>` exposes `gpe::GPE_solver_driven` for a fresh run
+  or a field supplied in memory.
+- `<gpe/GPE_solver_driven_contd.hpp>` exposes `gpe::GPE_solver_driven_contd` for
+  continuation directly from a compressed checkpoint.
+- `gpe::DrivenSimulationParameters` uses the dimensionless force `F` in place
+  of the injection velocity `V_0`. The initial drive velocity is zero and the
+  drive contribution is `(m/M)*F*t`, evaluated at absolute simulation time.
+- Both interfaces link to the same compiled `gpe::solver` library. A complete
+  fresh-run and compressed-continuation example is in `examples/driven/`.
+- The two original driven research programs now reside in `legacy/`, alongside
+  the two original quenched programs.
+
+## Convergence safeguard
+
+All four library interfaces and all four legacy programs stop if the requested
+Picard tolerance is not reached at the iteration limit, or if the final
+iterate/error is nonfinite. A failed step is never accepted or recorded.
+Convergence on the final allowed iteration is accepted. Library calls throw
+an exception; the command-line and legacy programs exit with failure.
+
+**API change:** `accept_unconverged_steps` has been removed from both parameter
+structs. Callers using that setting must remove it and handle nonconvergence.
+
+## Documentation and recorded examples
+
+The README has separate quenched and driven sections. The README and project
+website include driven-impurity animations for G=0.5, F=0.5 and G=15, F=4,
+both with gamma=1/400 and M=3m, plus the associated research papers.
+
+## Download and validation
+
+Download `bose-polaron-gpe-0.3.1.tar.gz` or `.zip`; these are source archives,
+not precompiled binaries. Build instructions are in README.md. Requirements
+remain C++17, Eigen 3.3+, zlib, libarchive with gzip/XZ support, and Make or
+CMake 3.17+; Python 3 runs the tests. Check downloads with `SHA256SUMS`.
+
+Tests cover driven acceleration, both force/coupling signs, in-memory and
+compressed restarts, strict nonconvergence handling, and convergence on the
+last allowed iteration. Small temporary variants exercise all four legacy
+programs. Release CI tests GCC and Clang and the extracted source archive.
+These checks do not establish full driven research-run equivalence, exact
+interacting conservation, or grid/time convergence. See VALIDATION.md.
+
+License: MIT.
+
+---
+
 # v0.2.0 — Public C++ library and legacy source organization
 
 Use `<gpe/solver.hpp>` and link to `gpe::solver` to run your own simulations.

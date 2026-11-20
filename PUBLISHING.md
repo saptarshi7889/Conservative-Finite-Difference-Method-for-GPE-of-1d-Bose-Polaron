@@ -1,4 +1,4 @@
-# Publishing v0.2.0
+# Publishing v0.3.1
 
 This release distributes source, not platform-specific binaries. Read
 RELEASE_NOTES.md and VALIDATION.md for requirements and numerical limitations.
@@ -15,13 +15,14 @@ cd dist
 sha256sum -c SHA256SUMS
 ```
 
-The packaging script creates `bose-polaron-gpe-0.2.0.tar.gz`,
-`bose-polaron-gpe-0.2.0.zip`, and `SHA256SUMS` under dist/. Archives include
-build inputs, tests, documentation, citation/license, both research programs
-under `legacy/`, the comparison runner, and the README animation. Local
-simulation data, build output, run logs, and other machine-specific example
-scripts are excluded. GitHub's automatic source
-archives contain the full tagged repository; the named package assets are smaller.
+The packaging script creates `bose-polaron-gpe-0.3.1.tar.gz`,
+`bose-polaron-gpe-0.3.1.zip`, and `SHA256SUMS` under dist/. Archives include
+build inputs, tests, documentation, citation/license, all four research programs
+under `legacy/`, the driven example, comparison runners, and recorded animations.
+The animation examples include sampled caches and rendering scripts whose input
+paths may need adjustment. Full original simulation archives and build output
+are excluded. GitHub's automatic source archives contain the full tagged
+repository; the named package assets contain the selected distribution files.
 No dependencies are downloaded by the local packaging script.
 
 ## Commit, push, and release
@@ -30,14 +31,11 @@ The maintainer retains control of commits. Review the prepared changes, then
 run these commands from the repository root yourself:
 
 ```sh
-git add -A -- README.md CMakeLists.txt CITATION.cff PUBLISHING.md RELEASE_NOTES.md \
-  VALIDATION.md legacy examples/L500_v05 scripts/package_release.py \
-  finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_contd_new_cluster_upwind_scheme.cpp \
-  finite_difference_modified_impurity_Thomas_generalized_without_Matrix_hermitian_vel_new_cluster_upwind_scheme_corrected.cpp
-git commit -m "release: prepare v0.2.0 source distribution"
+git add -- README.md docs/index.html CMakeLists.txt CITATION.cff PUBLISHING.md RELEASE_NOTES.md
+git commit -m "release: prepare v0.3.1 source distribution"
 git push origin master
-git tag -a v0.2.0 -m "Bose-polaron GPE solver v0.2.0"
-git push origin v0.2.0
+git tag -a v0.3.1 -m "Bose-polaron GPE solver v0.3.1"
+git push origin v0.3.1
 ```
 
 Pushing the tag triggers `.github/workflows/release.yml`. GitHub-hosted jobs
