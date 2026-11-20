@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(bose_polaron_gpe VERSION 0.2.0 LANGUAGES CXX)
+project(bose_polaron_gpe VERSION 0.3.1 LANGUAGES CXX)
 option(GPE_BUILD_PYTHON "Build the Python extension" OFF)
 option(GPE_BUILD_CLI "Build the command-line executable" ON)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
