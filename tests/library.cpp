@@ -63,13 +63,6 @@ int main(int argc, char** argv) {
     const auto accelerated=gpe::GPE_solver(free);
     require(std::abs(accelerated.final_velocity-free.mass_ratio*TEST_FORCE*free.t_final)
             <RESTART_TOLERANCE, "Free impurity acceleration is incorrect");
-    gpe::SimulationParameters capped;
-    capped.max_picard_iterations=1;
-    capped.accept_unconverged_steps=true;
-    capped.output_directory=root/"accepted_cap";
-    const auto accepted=gpe::GPE_solver(capped);
-    require(accepted.final_time==capped.t_final && accepted.final_field.allFinite(),
-            "Explicitly accepted capped steps must complete with a finite field");
     gpe::SimulationParameters bad;
     bad.output_directory=root/"bad";
     bad.initial_field=Eigen::VectorXcd::Ones(3);

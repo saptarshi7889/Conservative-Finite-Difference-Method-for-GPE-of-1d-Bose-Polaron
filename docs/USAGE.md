@@ -326,3 +326,14 @@ Retain F and the physical/grid settings. Compression formats, archive member
 selection, output cadence and convergence checks match the undriven API.
 The [complete driven example](../examples/driven/main.cpp) performs both calls.
 The original standalone adiabatic programs now reside in `legacy/`.
+
+## Picard convergence failure
+
+All four library interfaces throw `std::runtime_error` if the iterate-difference
+norm has not reached `picard_tolerance` after `max_picard_iterations` attempts,
+or if the final iterate/error is nonfinite. Convergence on the final permitted
+iteration is accepted. No velocity or field for a failed step is recorded;
+previously saved states remain on disk. The CLI and the four legacy programs
+exit with failure. Catch the exception in your own caller to handle the stop.
+The former `accept_unconverged_steps` setting has been removed: failed steps
+can no longer be accepted through the public parameter structs.

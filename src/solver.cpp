@@ -51,7 +51,6 @@ gpe::SimulationResult gpe::GPE_solver(const SimulationParameters& parameters) {
     metadata<<"length "<<Length<<"\ndx "<<delta_x<<"\ndt "<<delta_t<<"\nmass_ratio "<<m_tilde
               <<"\ncoupling "<<G_tilde<<"\ngamma "<<gamma<<"\nvelocity_0 "<<real(V_0)
               <<"\nforce "<<parameters.force
-              <<"\naccept_unconverged_steps "<<parameters.accept_unconverged_steps
               <<"\nstart "<<t_init<<"\nend "<<t_fin<<"\ntolerance "<<err_iter<<"\niterations "<<K_fin
               <<"\nsave_every "<<save_every<<"\nvelocity_every "<<velocity_every<<"\nrestart_velocity "<<real(V)<<"\nrestart_velocity_imag "<<imag(V)<<"\n";
     metadata.flush();
@@ -171,7 +170,7 @@ gpe::SimulationResult gpe::GPE_solver(const SimulationParameters& parameters) {
                Phi_k = Phi_hat;//Phi^{n+1}_k obtained
            }
        }
-         if ((k > K_fin && !parameters.accept_unconverged_steps)
+         if (k > K_fin
              || !Phi_hat.allFinite() || !isfinite(Error_iter.norm()))
              {
                  ostringstream message;

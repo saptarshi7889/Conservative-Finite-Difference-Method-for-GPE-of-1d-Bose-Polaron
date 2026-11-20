@@ -354,6 +354,13 @@ int main(int argc, char *argv[]) {
                Phi_k = Phi_hat;//Phi^{n+1}_k obtained
            }
        }
+         if (k > K_fin || !Phi_hat.allFinite() || !isfinite(Error_iter.norm()))
+         {
+             cerr << "Nonlinear iteration failed at time " << t+delta_t
+                  << " after " << min(k,K_fin) << " iterations; residual "
+                  << Error_iter.norm() << ", tolerance " << err_iter << endl;
+             return EXIT_FAILURE;
+         }
          Phi_n1 = Phi_hat;//Phi_{n+1} obtained
          Error_config = Phi_n1 - Phi_n;//measuring difference between the two configs in two consecutive TIME STEPS (NOT ITERATION STEPS)
          //new velocity calculation and file

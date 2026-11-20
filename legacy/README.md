@@ -1,7 +1,6 @@
 # Original research programs
 
-The two undriven C++ programs are preserved byte-for-byte from their original
-location in the repository root. They provide the historical fresh-run and continuation
+The two undriven C++ programs originate from the repository root. They provide the historical fresh-run and continuation
 implementations used for numerical comparisons.
 
 For new simulations, include `<gpe/solver.hpp>`, set
@@ -21,3 +20,10 @@ For driven simulations, use `<gpe/GPE_solver_driven.hpp>` and
 `<gpe/GPE_solver_driven_contd.hpp>` with `gpe::DrivenSimulationParameters`:
 F replaces V_0, and the imposed drive is (m/M) F t. See the
 [driven example and standalone instructions](../examples/driven/README.md).
+
+All four programs now terminate with a nonzero exit status if the Picard
+iteration limit is exhausted without meeting `err_iter`, or if the iterate or
+its error is nonfinite. The error message reports the attempted time, iteration
+count, last iterate-difference norm and tolerance. The failed step is not
+accepted or recorded. Convergence on the final allowed iteration is accepted.
+This safeguard is an intentional change to the historical sources.

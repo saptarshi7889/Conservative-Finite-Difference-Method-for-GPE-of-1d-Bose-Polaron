@@ -10,6 +10,7 @@ namespace gpe {
 // archive, specify the exact member name, e.g. "phi_1000.dat".
 // Decompression is streamed into the field; no expanded file is created.
 // Uses the same evolution and output conventions as GPE_solver.
+// Picard nonconvergence throws before accepting or recording the failed step.
 SimulationResult GPE_solver_contd(
     const SimulationParameters& parameters,
     const std::filesystem::path& checkpoint_file,

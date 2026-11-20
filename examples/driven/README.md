@@ -74,7 +74,9 @@ from the repository root; use an absolute executable path when running elsewhere
 It does not read compressed checkpoints; the packaged library does.
 
 The original continuation source has a repaired stream declaration and a
-filename for its driven-velocity output. Its numerical update is unchanged.
+filename for its driven-velocity output. All four legacy programs now also
+stop with failure if the Picard tolerance is not met at the iteration limit,
+before accepting or recording the failed step.
 Original-program output cadence, convergence handling and filenames differ
 from the packaged library. No driven research-run equivalence claim is made.
 
