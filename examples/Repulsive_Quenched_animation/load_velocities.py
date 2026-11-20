@@ -4,6 +4,8 @@ from pathlib import Path
 import re
 import subprocess
 import tarfile
+import threading
+from contextlib import contextmanager
 
 import numpy as np
 
@@ -23,6 +25,33 @@ DIRECT = {
     'V1_dx2500/': 1.0,
 }
 INITIAL_TOLERANCE = 1e-5
+
+
+@contextmanager
+def nested_archive(compressed):
+    """Use the existing gzip executable to decode large nested archives."""
+    decoder = subprocess.Popen(['gzip', '-dc'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    def feed():
+        try:
+            while chunk := compressed.read(TAR_BUFFER_BYTES):
+                decoder.stdin.write(chunk)
+        except BrokenPipeError:
+            pass
+        finally:
+            try:
+                decoder.stdin.close()
+            except BrokenPipeError:
+                pass
+    worker = threading.Thread(target=feed)
+    worker.start()
+    try:
+        with tarfile.open(fileobj=decoder.stdout, mode='r|', bufsize=TAR_BUFFER_BYTES) as inner:
+            yield inner
+    finally:
+        decoder.stdout.close()
+        decoder.terminate()
+        decoder.wait()
+        worker.join()
 
 
 def main():
@@ -48,8 +77,9 @@ def main():
                         initial = NESTED[relative]
                         print(f'Reading nested archive {relative}', flush=True)
                         with archive.extractfile(member) as compressed:
-                            with tarfile.open(fileobj=compressed, mode='r|gz', bufsize=TAR_BUFFER_BYTES) as inner:
+                            with nested_archive(compressed) as inner:
                                 for child in inner:
+                                    print(f'Nested member: {child.name} ({child.size} bytes)', flush=True)
                                     name = Path(child.name).name
                                     if child.isfile() and name.startswith('impurity_velocity_') and re.search(rf'G1m0\.333333V{initial:g}dx', name):
                                         with inner.extractfile(child) as stream:
