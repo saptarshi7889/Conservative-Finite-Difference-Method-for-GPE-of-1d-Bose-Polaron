@@ -82,9 +82,9 @@ from the packaged library. No driven research-run equivalence claim is made.
 
 ## Recorded animations
 
-- [Generalized case](../G05_F05_L8500/README.md): G=0.5, F=0.5,
+- [Generalized case](../Repulsive_driven_animation/G05_F05_L8500/README.md): G=0.5, F=0.5,
   gamma=1/400, M=3m, L=8500.
-- [Very strongly coupled impurity](../F4/README.md): G=15, F=4,
+- [Very strongly coupled impurity](../Repulsive_driven_animation/F4/README.md): G=15, F=4,
   gamma=1/400, M=3m.
 
 The render scripts retain original local source-data paths. Watching the supplied

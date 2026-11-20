@@ -15,10 +15,13 @@ All four solver interfaces stop on Picard nonconvergence; failed steps are not a
 
 Python users call the same compiled C++ solver using `bose_polaron_gpe`.
 NumPy arrays represent fields; all evolution and checkpoint I/O remain in C++.
-**Use a checkout containing `pyproject.toml` and `environment-python.yml`: the
-Python interface is not in the v0.3.1 archives below and is not yet on PyPI.**
+**Release v1.3.1 includes Python support.** Download and extract a complete
+[source archive below](#download), or use this checkout. The Python package is
+installed from source; it has not been uploaded to PyPI, and portable wheels
+are not part of this release.
 
-From this repository's root, create a dedicated environment and install:
+From the extracted source directory or repository root, create a dedicated
+environment and install:
 
 ```sh
 conda env create -f environment-python.yml
@@ -70,16 +73,16 @@ requirements and wheel limitations, and the
 ## Shared setup
 
 The following download and build commands are for C++ users in both cases.
-Python users should follow the installation above. Release v0.3.1 includes
-both quenched and driven C++ impurity solvers.
+Python users should follow the installation above. Release v1.3.1 includes
+both quenched and driven solvers, with C++ and Python interfaces.
 
 ### Download
 
-Download **one complete source archive** from release **v0.3.1**:
+Download **one complete source archive** from release **v1.3.1**:
 
-- **[Download .tar.gz (Linux/macOS)](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.3.1/bose-polaron-gpe-0.3.1.tar.gz)**
-- **[Download .zip](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.3.1/bose-polaron-gpe-0.3.1.zip)**
-- [Release notes and checksums](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/tag/v0.3.1)
+- **[Download .tar.gz (Linux/macOS)](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v1.3.1/bose-polaron-gpe-1.3.1.tar.gz)**
+- **[Download .zip](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v1.3.1/bose-polaron-gpe-1.3.1.zip)**
+- [Release notes and checksums](https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/tag/v1.3.1)
 
 Both archives contain the same source code. Download the complete archive:
 these headers belong to a **compiled library** and require the implementation
@@ -94,8 +97,8 @@ these dependencies separate from your base environment.
 For the `.tar.gz` download:
 
 ```sh
-tar -xzf bose-polaron-gpe-0.3.1.tar.gz
-cd bose-polaron-gpe-0.3.1
+tar -xzf bose-polaron-gpe-1.3.1.tar.gz
+cd bose-polaron-gpe-1.3.1
 conda env create -f environment.yml
 conda activate bose-polaron-gpe
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -104,7 +107,7 @@ ctest --test-dir build --output-on-failure
 ./build/gpe --output results
 ```
 
-For `.zip`, extract it and enter `bose-polaron-gpe-0.3.1`, then follow the same
+For `.zip`, extract it and enter `bose-polaron-gpe-1.3.1`, then follow the same
 commands starting at `conda env create`. If you already have the dependencies,
 start at `cmake -S .`. Environment creation downloads packages; build commands
 use existing dependencies.
@@ -113,6 +116,29 @@ The last command runs a small demonstration from a uniform field to `t=0.02`.
 Its defaults are L=16, dx=0.125, dt=0.001, V0=2, m/M=0.125, G=-1.5,
 and gamma=0.1. It is a functionality check, not a converged research simulation.
 Each run needs a **new output directory**. List options with `./build/gpe --help`.
+
+### Using the public C++ headers
+
+**Yes: C++ users can include the supplied public headers as they are in their
+own programs.** Choose the interface for your simulation:
+
+| Simulation | Header to include | Function |
+| --- | --- | --- |
+| Quenched fresh run / field in memory | `<gpe/solver.hpp>` | `gpe::GPE_solver` |
+| Quenched compressed continuation | `<gpe/GPE_solver_contd.hpp>` | `gpe::GPE_solver_contd` |
+| Driven fresh run / field in memory | `<gpe/GPE_solver_driven.hpp>` | `gpe::GPE_solver_driven` |
+| Driven compressed continuation | `<gpe/GPE_solver_driven_contd.hpp>` | `gpe::GPE_solver_driven_contd` |
+
+These headers declare the interface to a **compiled library**; they are not
+standalone header-only solvers. Download the complete source, build and install
+the library, then link your program to `gpe::solver`. Copying the headers alone
+is insufficient because their implementations are in `src/`. The Python
+bindings are optional and are not needed to use the C++ interfaces.
+
+The CMake integration and installed-library examples below apply to all four
+headers. Set `SimulationParameters` for the quenched case or
+`DrivenSimulationParameters` for the driven case. You do not need to edit the
+headers or run the supplied command-line executable to call the library.
 
 ## 1. Constant momentum (Quenched) impurity
 
@@ -283,7 +309,7 @@ Set `gpe::DrivenSimulationParameters`: the simulation settings match
 `SimulationParameters`, with `F` replacing `V_0` and no separate `force` field.
 Link to the same `gpe::solver` compiled library. The default initial field is uniform.
 
-The v0.3.1 source archives above include both driven headers, their compiled
+The v1.3.1 source archives above include both driven headers, their compiled
 implementation, and the runnable example.
 
 [Runnable driven example and research-code instructions](examples/driven/README.md)
@@ -377,7 +403,7 @@ G = 0.5, F = 0.5, gamma = 1/400, M = 3m (L = 8500).
 ![Driven impurity, G=0.5 and F=0.5](docs/media/G05_F05_L8500/velocity_density_animation.gif)
 
 [Watch/download MP4](docs/media/G05_F05_L8500/velocity_density_animation.mp4) ·
-[Animation provenance and rendering](examples/G05_F05_L8500/README.md)
+[Animation provenance and rendering](examples/Repulsive_driven_animation/G05_F05_L8500/README.md)
 
 ### Very strongly coupled impurity
 
@@ -386,7 +412,7 @@ G = 15, F = 4, gamma = 1/400, M = 3m.
 ![Strongly coupled driven impurity, G=15 and F=4](docs/media/F4/velocity_density_animation.gif)
 
 [Watch/download MP4](docs/media/F4/velocity_density_animation.mp4) ·
-[Animation provenance and rendering](examples/F4/README.md)
+[Animation provenance and rendering](examples/Repulsive_driven_animation/F4/README.md)
 
 Both animations show recorded velocity and density in the impurity frame.
 Their immersion openings and transitions to the first saved field are

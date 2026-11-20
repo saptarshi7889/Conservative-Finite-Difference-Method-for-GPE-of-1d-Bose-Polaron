@@ -4,9 +4,12 @@
 Python and Jupyter. All evolution, Picard iterations, checkpoint reading and
 output remain in C++; there is no subprocess for a solver call.
 
-This branch provides a source-buildable package. It has not been uploaded to
-PyPI, and portable precompiled wheels have not yet been released. The Python
-package version follows this branch's CMake project version.
+Release v1.3.1 provides a source-buildable Python package alongside the C++
+library. It has not been uploaded to PyPI, and portable precompiled wheels are
+not part of this release. The Python package version follows the CMake project
+version. The complete release archives include everything needed to build
+either interface; the smaller Python source distribution contains the binding
+and native build inputs without the animation datasets.
 
 ## Install from this checkout
 

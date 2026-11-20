@@ -16,9 +16,9 @@
   </header>
   <main id="main">
     <section class="hero wrap">
-      <div class="eyebrow"><span class="status-dot"></span> OPEN-SOURCE RESEARCH SOFTWARE · v0.3.1</div>
+      <div class="eyebrow"><span class="status-dot"></span> OPEN-SOURCE RESEARCH SOFTWARE · v1.3.1</div>
       <h1>Simulate a mobile impurity<br> in a <em>one-dimensional</em><br> Bose gas.</h1>
-      <div class="hero-bottom"><p>A C++17 library for the coupled Gross–Pitaevskii equation and impurity velocity. Start from a uniform field, supply your own state, or continue from a compressed checkpoint.</p><div class="hero-actions"><a class="button primary" href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.3.1/bose-polaron-gpe-0.3.1.tar.gz">Download source <span aria-hidden="true">↓</span></a><a class="text-link" href="#start">Build your first simulation <span aria-hidden="true">→</span></a></div></div>
+      <div class="hero-bottom"><p>A C++17 library with Python bindings for the coupled Gross–Pitaevskii equation and impurity velocity. Start from a uniform field, supply your own state, or continue from a compressed checkpoint.</p><div class="hero-actions"><a class="button primary" href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v1.3.1/bose-polaron-gpe-1.3.1.tar.gz">Download source <span aria-hidden="true">↓</span></a><a class="text-link" href="#start">Build your first simulation <span aria-hidden="true">→</span></a></div></div>
       <div class="specs"><span>C++17</span><span>Periodic boundaries</span><span>Picard iteration</span><span>Compressed checkpoints</span><span>MIT license</span></div>
     </section>
 
@@ -26,8 +26,8 @@
       <div class="wrap split">
         <div class="section-intro"><span class="eyebrow">01 / GET STARTED</span><h2>Download.<br> Build.<br> Evolve.</h2><p>Use the complete source archive. The public headers link to a compiled library, with the implementation included under <code>src/</code>.</p><p class="small">The default run is a small functionality example. Set physical and numerical parameters for your study.</p></div>
         <div class="steps">
-          <article class="step"><span class="step-number">1</span><div><h3>Get the source</h3><p><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.3.1/bose-polaron-gpe-0.3.1.tar.gz">Download .tar.gz</a> or <a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v0.3.1/bose-polaron-gpe-0.3.1.zip">.zip</a>. Both contain the same source.</p><pre><code>tar -xzf bose-polaron-gpe-0.3.1.tar.gz
-cd bose-polaron-gpe-0.3.1</code></pre></div></article>
+          <article class="step"><span class="step-number">1</span><div><h3>Get the source</h3><p><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v1.3.1/bose-polaron-gpe-1.3.1.tar.gz">Download .tar.gz</a> or <a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/download/v1.3.1/bose-polaron-gpe-1.3.1.zip">.zip</a>. Both contain the same source.</p><pre><code>tar -xzf bose-polaron-gpe-1.3.1.tar.gz
+cd bose-polaron-gpe-1.3.1</code></pre></div></article>
           <article class="step"><span class="step-number">2</span><div><h3>Prepare a project environment</h3><p>Conda installs the declared dependencies into a dedicated environment. Existing compatible dependencies can also be used.</p><pre><code>conda env create -f environment.yml
 conda activate bose-polaron-gpe</code></pre></div></article>
           <article class="step"><span class="step-number">3</span><div><h3>Build, test, and run</h3><pre><code>cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -36,6 +36,16 @@ ctest --test-dir build --output-on-failure
 ./build/gpe --output results</code></pre><p class="small">Requires a C++17 compiler, Eigen 3.3+, zlib, libarchive with gzip/XZ support, CMake 3.17+, and Python for tests. Each run needs a new output directory.</p></div></article>
         </div>
       </div>
+    </section>
+
+    <section class="wrap library-section" id="python">
+      <div class="section-top"><div><span class="eyebrow">PYTHON SUPPORT · v1.3.1</span><h2>The same solver,<br> in Python.</h2></div><p>Import <code>bose_polaron_gpe</code> to call all four interfaces with NumPy fields. Evolution, compressed checkpoints, and strict Picard checks use the existing compiled C++ implementation.</p></div>
+      <pre><code>conda env create -f environment-python.yml
+conda activate bose-polaron-gpe-python
+python -m pip install --no-build-isolation --no-deps .</code></pre>
+      <p>Run these commands from an extracted complete release archive or repository checkout. This is a source installation; PyPI publication and portable wheels are not included.</p>
+      <p><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/v1.3.1/docs/PYTHON.md">Python installation and examples</a></p>
+      <p>C++ users can include the public headers unchanged and link their programs to <code>gpe::solver</code>. The headers require the compiled implementation in <code>src/</code>; copying headers alone is insufficient. The Python bindings are optional.</p>
     </section>
 
     <section class="wrap library-section" id="library">
@@ -70,13 +80,13 @@ auto result = gpe::GPE_solver_contd(
     <section class="wrap library-section" id="driven">
       <div class="section-top"><div><span class="eyebrow">CONSTANT-FORCE DYNAMICS</span><h2>A driven impurity.</h2></div><p>A constant force F drives the impurity through the Bose gas. Fresh runs and compressed continuation use the same compiled library through <code>GPE_solver_driven</code> and <code>GPE_solver_driven_contd</code>, with <code>DrivenSimulationParameters::F</code>. The drive uses absolute time: (m/M)Ft.</p></div>
       <p>The driven interfaces fix the initial drive velocity at zero; F replaces the V₀ input. For these examples M = 3m, so <code>mass_ratio = 1.0 / 3.0</code>. Retain F and the physical/grid settings when restarting, and supply the checkpoint time and velocity.</p>
-      <p><strong>Release v0.3.1 includes the new constant-force fresh-run and continuation interfaces.</strong> <a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/archive/refs/heads/master.zip">Download current source ZIP</a> · <a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/examples/driven/README.md">Build and run the driven example</a>. The two original adiabatic research programs are preserved in <code>legacy/</code>, with standalone build instructions.</p>
+      <p><strong>Release v1.3.1 includes the new constant-force fresh-run and continuation interfaces.</strong> <a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/archive/refs/heads/master.zip">Download current source ZIP</a> · <a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/examples/driven/README.md">Build and run the driven example</a>. The two original adiabatic research programs are preserved in <code>legacy/</code>, with standalone build instructions.</p>
       <h3>Generalized case</h3><p>G = 0.5, F = 0.5, γ = 1/400, M = 3m; L = 8500.</p>
       <figure class="simulation"><video controls muted loop playsinline preload="metadata" poster="media/G05_F05_L8500/velocity_density_animation_preview.png" aria-label="Generalized case: impurity velocity and boson density"><source src="media/G05_F05_L8500/velocity_density_animation.mp4" type="video/mp4"><a href="media/G05_F05_L8500/velocity_density_animation.gif">View animated GIF</a></video><figcaption><span>RECORDED VELOCITY AND DENSITY · IMPURITY FRAME</span><a href="media/G05_F05_L8500/velocity_density_animation.gif">View GIF</a></figcaption></figure>
-      <p><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/examples/G05_F05_L8500/README.md">Animation provenance and rendering details</a></p>
+      <p><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/examples/Repulsive_driven_animation/G05_F05_L8500/README.md">Animation provenance and rendering details</a></p>
       <h3>Very strongly coupled impurity</h3><p>G = 15, F = 4, γ = 1/400, M = 3m.</p>
       <figure class="simulation"><video controls muted loop playsinline preload="metadata" poster="media/F4/velocity_density_animation_preview.png" aria-label="Very strongly coupled impurity: impurity velocity and boson density"><source src="media/F4/velocity_density_animation.mp4" type="video/mp4"><a href="media/F4/velocity_density_animation.gif">View animated GIF</a></video><figcaption><span>RECORDED VELOCITY AND DENSITY · IMPURITY FRAME</span><a href="media/F4/velocity_density_animation.gif">View GIF</a></figcaption></figure>
-      <p><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/examples/F4/README.md">Animation provenance and rendering details</a></p>
+      <p><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/examples/Repulsive_driven_animation/F4/README.md">Animation provenance and rendering details</a></p>
       <p class="small">The immersion openings and transitions into the first saved fields are illustrative. These are supplied research simulations; the small runnable example does not reproduce their full grids or duration.</p>
     </section>
 
@@ -84,6 +94,6 @@ auto result = gpe::GPE_solver_contd(
 
     <section class="citation-section"><div class="wrap citation"><span class="eyebrow">RESEARCH &amp; CITATION</span><h2>Built for reproducible research.</h2><p>Saptarshi Majumdar and Aleksandra Petković, “Relaxation dynamics of a mobile impurity injected into a one-dimensional Bose gas,” <em>Physical Review A</em> <strong>112</strong>, 053326 (2025).</p><a class="text-link" href="https://doi.org/10.1103/tgl5-rdn5">Read the paper <span aria-hidden="true">↗</span></a><p>Saptarshi Majumdar and Aleksandra Petković, “Bloch oscillations of a mobile impurity in a one-dimensional Bose gas,” <em>Physical Review A</em> <strong>113</strong>, 043309 (2026). Constant-force dynamics with repulsive coupling. <a href="https://journals.aps.org/pra/abstract/10.1103/bfcg-m2tw">Read the paper</a>.</p><p>Saptarshi Majumdar and Aleksandra Petković, “Driven dynamics of an attractive Bose polaron,” <em>Physical Review A</em> <strong>114</strong>, 053303 (2026). Constant-force dynamics with attractive coupling. <a href="https://journals.aps.org/pra/abstract/10.1103/t36j-gd59">Read the paper</a>.</p></div></section>
   </main>
-  <footer class="wrap footer"><span>1D Bose Polaron · GPE Solver</span><div><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron">Source code</a><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/tag/v0.3.1">Release v0.3.1</a><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/LICENSE">MIT license</a></div></footer>
+  <footer class="wrap footer"><span>1D Bose Polaron · GPE Solver</span><div><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron">Source code</a><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/releases/tag/v1.3.1">Release v1.3.1</a><a href="https://github.com/saptarshi7889/Conservative-Finite-Difference-Method-for-GPE-of-1d-Bose-Polaron/blob/master/LICENSE">MIT license</a></div></footer>
 </body>
 </html>

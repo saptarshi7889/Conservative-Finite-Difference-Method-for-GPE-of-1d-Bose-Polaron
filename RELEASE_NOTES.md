@@ -1,3 +1,52 @@
+# v1.3.1 — Python support alongside the C++ library
+
+Python users can now import `bose_polaron_gpe` and call the same C++ numerical
+implementation with ordinary Python syntax. Both quenched and driven impurity
+simulations support fresh runs and compressed-checkpoint continuation.
+
+## Python interfaces
+
+- `SimulationParameters`, `DrivenSimulationParameters` and `SimulationResult`
+  are exposed alongside all four solver functions: `GPE_solver`,
+  `GPE_solver_contd`, `GPE_solver_driven` and `GPE_solver_driven_contd`.
+- Complex fields use NumPy arrays, paths accept strings or `pathlib.Path`, and
+  C++ errors become Python exceptions. Strict Picard stopping is preserved.
+- The final field is a read-only NumPy view that retains its C++ owner. Initial
+  fields and run settings are copied before evolution; the GIL is released
+  while the compiled solver runs.
+- `environment-python.yml`, installation instructions, a complete Python
+  example and installed-package tests are included. Build dependencies and
+  runtime native libraries are required for source installation.
+
+## C++ usage and portability
+
+C++ users can include the four supplied public headers unchanged and call the
+library from their own programs by linking to `gpe::solver`. These are interfaces
+to a compiled library, not standalone header-only implementations: the full
+source and implementation under `src/` are required. Python bindings remain
+optional for C++ users.
+
+Eigen 1×1 complex products now use explicit scalar extraction, fixing the
+macOS Clang/libc++ compilation error while retaining transpose semantics.
+Release packaging follows the reorganized animation folders.
+
+## Downloads and checks
+
+The release provides complete `.tar.gz` and `.zip` source archives, a smaller
+Python source distribution (`bose_polaron_gpe-1.3.1.tar.gz`), and `SHA256SUMS`.
+This is a source release: no portable wheels, precompiled executables, or PyPI
+upload are included. See README.md and docs/PYTHON.md for installation.
+
+Publication waits for GCC/Clang C++ validation, extracted-archive tests, and
+Python 3.10/3.13 package tests on Linux and macOS. Tests cover Python/C++
+agreement, NumPy ownership, checkpoint formats, restart consistency and Picard
+failure handling. These are implementation checks; scientific conservation and
+grid/time convergence still need to be established for each study.
+
+License: MIT.
+
+---
+
 # v0.3.1 — New driven-impurity codes and strict Picard convergence
 
 This release adds codes for a **constant-force (driven) impurity**, alongside
