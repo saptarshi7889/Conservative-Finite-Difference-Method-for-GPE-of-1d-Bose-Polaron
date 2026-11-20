@@ -1,0 +1,150 @@
+<div id="polaron-preview">
+  <div class="viz-row">
+    <h2>Impurity motion · pixel study</h2>
+    <button class="btn" type="button" id="polaron-play">Pause</button>
+    <button class="btn" type="button" id="polaron-replay">Replay</button>
+  </div>
+  <section>
+    <h3>Quenched · Constant momentum</h3>
+    <canvas id="polaron-quenched" width="640" height="260" role="img" aria-label="Pixel animation of a blue impurity moving through red bosons in a one-dimensional tube. It slows and approaches a nonzero constant velocity. No external force."></canvas>
+    <div class="text-small text-muted">Initial kick · relaxation toward steady motion · no external force</div>
+  </section>
+  <section>
+    <h3>Driven · Constant force</h3>
+    <canvas id="polaron-driven" width="640" height="260" role="img" aria-label="Pixel animation of a blue impurity in a one-dimensional tube, oscillating back and forth with an overall drift. A persistent rightward arrow marks the applied force."></canvas>
+    <div class="text-small text-muted">Continuous force · Bloch oscillations with drift</div>
+  </section>
+  <div class="text-small text-muted" id="polaron-status" aria-live="polite"></div>
+</div>
+<style>
+  #polaron-preview { display: grid; gap: calc(var(--font-size-base) * 1.2); }
+  #polaron-preview section { display: grid; gap: calc(var(--font-size-base) * .5); }
+  #polaron-preview canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+</style>
+<script>
+(() => {
+  const root = document.getElementById('polaron-preview');
+  const play = root.querySelector('#polaron-play');
+  const replay = root.querySelector('#polaron-replay');
+  const status = root.querySelector('#polaron-status');
+  const canvases = ['quenched', 'driven'].map(mode => ({mode, canvas: root.querySelector('#polaron-' + mode)}));
+  const C = {
+    width: 320, height: 130, scale: 2, duration: 12,
+    tubeY: 76, tubeHalfHeight: 24, tubeStart: 12, tubeEnd: 308,
+    bosonSpacing: 15, bosonRadius: 3, impurityRadius: 12,
+    initialX: 52, steadySpeed: 13, excessSpeed: 44, relaxation: 1.7,
+    driftSpeed: 11, oscillationSpeed: 45, period: 3,
+    frameLimit: .1, ghostInterval: .17, ghosts: 4
+  };
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let time = 0, previous = null;
+  let playing = window.openai?.widgetState?.privateContent?.playing ?? !reduced;
+  const css = name => getComputedStyle(root).getPropertyValue(name).trim();
+  const colors = {};
+  function palette() {
+    const resolver = document.createElement('span');
+    root.appendChild(resolver);
+    for (const [key, token, fallback] of [['ink','--foreground','CanvasText'], ['tube','--green','CanvasText'], ['boson','--red','CanvasText'], ['impurity','--blue','Highlight'], ['background','--background','Canvas']]) {
+      resolver.style.color = css(token) || fallback;
+      colors[key] = getComputedStyle(resolver).color;
+    }
+    resolver.remove();
+  }
+  function motion(mode, t) {
+    if (mode === 'quenched') return {
+      x: C.initialX + C.steadySpeed*t + C.excessSpeed*C.relaxation*(1-Math.exp(-t/C.relaxation)),
+      v: C.steadySpeed + C.excessSpeed*Math.exp(-t/C.relaxation)
+    };
+    const omega = 2*Math.PI/C.period;
+    return { x: C.initialX+C.driftSpeed*t+C.oscillationSpeed/omega*(1-Math.cos(omega*t)), v: C.driftSpeed+C.oscillationSpeed*Math.sin(omega*t) };
+  }
+  function sphere(ctx, x, y, radius, color, opacity=1) {
+    x = Math.round(x); y = Math.round(y);
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = color;
+    ctx.fillRect(x-radius+2, y-radius, radius*2-4, radius*2);
+    ctx.fillRect(x-radius, y-radius+3, radius*2, radius*2-6);
+    ctx.fillStyle = colors.background;
+    ctx.globalAlpha = opacity*.45;
+    ctx.fillRect(x-radius+3, y-radius+2, Math.max(2,radius-3), Math.max(2,radius-3));
+    ctx.fillStyle = colors.ink;
+    ctx.globalAlpha = opacity*.38;
+    ctx.fillRect(x+radius-3, y-radius+4, 3, radius*2-7);
+    ctx.fillRect(x-radius+4, y+radius-3, radius*2-7, 3);
+    ctx.globalAlpha = 1;
+  }
+  function arrow(ctx, x, y, length, label, color) {
+    const direction = Math.sign(length) || 1;
+    const end = Math.round(x+length);
+    ctx.fillStyle = color;
+    ctx.fillRect(Math.min(x,end), y, Math.max(2,Math.abs(length)), 2);
+    for(let step=0; step<4; step++) ctx.fillRect(end-direction*step, y-step, 2, step*2+2);
+    ctx.font = '10px monospace';
+    ctx.fillText(label, Math.min(x,end), y-7);
+  }
+  function draw({mode, canvas}) {
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(C.scale,0,0,C.scale,0,0);
+    ctx.clearRect(0,0,C.width,C.height);
+    const m = motion(mode,time);
+    const camera = Math.max(0,m.x-230);
+    const x = Math.round(m.x-camera);
+    ctx.fillStyle = colors.tube;
+    ctx.globalAlpha = .08;
+    ctx.fillRect(C.tubeStart,C.tubeY-C.tubeHalfHeight,C.tubeEnd-C.tubeStart,C.tubeHalfHeight*2);
+    ctx.globalAlpha = .3;
+    // Stepped perspective edges keep the tube legible in a pixel style.
+    for (const sign of [-1,1]) {
+      ctx.fillRect(23,C.tubeY+sign*C.tubeHalfHeight,274,2);
+      ctx.fillRect(15,C.tubeY+sign*(C.tubeHalfHeight-4),9,2);
+      ctx.fillRect(297,C.tubeY+sign*(C.tubeHalfHeight-4),9,2);
+    }
+    ctx.globalAlpha = 1;
+    for(let i=-1;i<23;i++) {
+      const bx = C.tubeStart+i*C.bosonSpacing-((camera%C.bosonSpacing)+C.bosonSpacing)%C.bosonSpacing;
+      if(bx<20 || bx>300 || Math.abs(bx-x)<18) continue;
+      sphere(ctx,bx,C.tubeY,C.bosonRadius,colors.boson);
+    }
+    for(let i=C.ghosts;i>0;i--) {
+      const past = motion(mode,Math.max(0,time-i*C.ghostInterval));
+      sphere(ctx,past.x-camera,C.tubeY,C.impurityRadius,colors.impurity,.035*(C.ghosts+1-i));
+    }
+    sphere(ctx,x,C.tubeY,C.impurityRadius,colors.impurity);
+    const velocityLength = Math.sign(m.v)*Math.max(5,Math.abs(m.v)*.65);
+    arrow(ctx,x,C.tubeY+36,velocityLength,'v',colors.ink);
+    if(mode==='driven') arrow(ctx,x+7,C.tubeY-34,42,'F',colors.boson);
+    ctx.fillStyle = colors.ink;
+    ctx.font = '10px monospace';
+    ctx.fillText('BOSONS',240,115);
+  }
+  function render() { canvases.forEach(draw); }
+  function updateControls() {
+    play.textContent = playing ? 'Pause' : 'Play';
+    status.textContent = time>=C.duration ? 'Preview complete' : (playing ? 'Playing' : 'Paused');
+  }
+  function save() {
+    window.openai?.setWidgetState({modelContent:{preview:'Retro impurity motion'},privateContent:{playing}})?.catch(()=>{});
+  }
+  play.addEventListener('click',()=>{
+    if(time>=C.duration) time=0;
+    playing=!playing; previous=null; updateControls(); save();
+  });
+  replay.addEventListener('click',()=>{
+    time=0; previous=null; playing=true; updateControls(); save(); render();
+  });
+  window.addEventListener('openai:set_globals',event=>{
+    const saved = event.detail?.globals?.widgetState?.privateContent;
+    if(typeof saved?.playing==='boolean') { playing=saved.playing; previous=null; updateControls(); }
+  });
+  new MutationObserver(()=>{palette();render();}).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
+  function frame(now) {
+    if(playing && previous!==null) {
+      time=Math.min(C.duration,time+Math.min(C.frameLimit,(now-previous)/1000));
+      if(time>=C.duration) {playing=false; updateControls();}
+    }
+    previous=now;
+    render(); requestAnimationFrame(frame);
+  }
+  palette(); updateControls(); render(); requestAnimationFrame(frame);
+})();
+</script>
